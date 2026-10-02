@@ -127,7 +127,7 @@ export function NewsletterSignup({ className = '', variant = 'footer' }: Newslet
             {/* Subscription Form */}
             <form onSubmit={handleSubmit} className="space-y-2 max-w-md" noValidate>
               <div className="relative">
-                <div className="relative flex rounded-xs overflow-hidden border transition-colors shadow-inner bg-[#241F1B] focus-within:ring-1 focus-within:ring-[#D4AF37] focus-within:border-[#D4AF37] border-[#3E3832]">
+                <div className="relative flex rounded-full overflow-hidden border transition-colors shadow-inner bg-[#241F1B] focus-within:ring-1 focus-within:ring-[#D4AF37] focus-within:border-[#D4AF37] border-[#3E3832]">
                   <div className="pl-3.5 flex items-center pointer-events-none text-[#8A7D70]">
                     <Mail className="w-4 h-4" />
                   </div>
@@ -191,7 +191,7 @@ export function NewsletterSignup({ className = '', variant = 'footer' }: Newslet
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="p-5 bg-gradient-to-br from-[#25201B] to-[#1C1815] border border-[#4A3F33] rounded-xs max-w-md space-y-4 shadow-xl relative overflow-hidden"
+            className="p-5 bg-gradient-to-br from-[#25201B] to-[#1C1815] border border-[#4A3F33] rounded-2xl max-w-md space-y-4 shadow-xl relative overflow-hidden"
           >
             {/* Subtle decorative gold sheen */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/5 rounded-full blur-2xl pointer-events-none" />
@@ -224,7 +224,7 @@ export function NewsletterSignup({ className = '', variant = 'footer' }: Newslet
             </div>
 
             {/* Voucher token copy card */}
-            <div className="bg-[#181512] border border-[#3A332B] p-3 rounded-xs flex items-center justify-between">
+            <div className="bg-[#181512] border border-[#3A332B] p-3 rounded-xl flex items-center justify-between">
               <div>
                 <span className="text-[9px] uppercase tracking-widest text-[#8A7D70] block font-semibold">
                   Privilege Voucher Code (₹1,500 Off)
@@ -236,7 +236,7 @@ export function NewsletterSignup({ className = '', variant = 'footer' }: Newslet
               <button
                 type="button"
                 onClick={handleCopyCode}
-                className="flex items-center gap-1 text-[11px] uppercase tracking-wider font-semibold px-2.5 py-1.5 rounded-xs bg-[#2B2520] hover:bg-[#3B332B] text-white transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-[11px] uppercase tracking-wider font-semibold px-3 py-1.5 rounded-full bg-[#2B2520] hover:bg-[#3B332B] text-white transition-colors cursor-pointer"
                 title="Copy voucher code"
               >
                 {copiedCode ? (

@@ -49,7 +49,7 @@ export function QuickAddModal({
     >
       <div
         id="quick-add-sheet"
-        className="w-full sm:max-w-md bg-[#FAF8F5] rounded-t-xl sm:rounded-lg p-5 sm:p-6 shadow-2xl transition-all"
+        className="w-full sm:max-w-md bg-[#FAF8F5] rounded-t-3xl sm:rounded-2xl p-5 sm:p-6 shadow-2xl transition-all overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -58,7 +58,7 @@ export function QuickAddModal({
             <img
               src={activeColorObj.images[0]}
               alt={product.title}
-              className="w-16 h-20 object-cover rounded-xs bg-[#EFE9DF]"
+              className="w-16 h-20 object-cover rounded-xl bg-[#EFE9DF]"
             />
             <div>
               <span className="text-[10px] tracking-[0.2em] text-[#8C8074] uppercase font-semibold">
@@ -139,7 +139,7 @@ export function QuickAddModal({
                   key={s.size}
                   disabled={!isAvailable}
                   onClick={() => setSelectedSize(s.size)}
-                  className={`py-2 text-xs font-medium rounded-xs border transition-all relative ${
+                  className={`py-2 text-xs font-medium rounded-xl border transition-all relative ${
                     !isAvailable
                       ? 'border-[#EBE4D8] bg-[#F5EFE6]/50 text-[#B5A99B] cursor-not-allowed line-through'
                       : isSelected
@@ -165,12 +165,12 @@ export function QuickAddModal({
             id="btn-confirm-quick-add"
             disabled={!selectedSize || isAdded}
             onClick={handleAdd}
-            className={`w-full py-3 px-4 text-xs font-semibold uppercase tracking-[0.16em] rounded-xs transition-all flex items-center justify-center gap-2 ${
+            className={`w-full py-3.5 px-6 text-xs font-semibold uppercase tracking-[0.16em] rounded-full transition-all flex items-center justify-center gap-2 ${
               isAdded
                 ? 'bg-[#3F6A48] text-white'
                 : !selectedSize
                 ? 'bg-[#DDD5C7] text-[#857B6F] cursor-not-allowed'
-                : 'bg-[#1F1C18] text-[#FAF8F5] hover:bg-black active:scale-[0.99]'
+                : 'bg-[#1F1C18] text-[#FAF8F5] hover:bg-black active:scale-[0.99] shadow-sm'
             }`}
           >
             {isAdded ? (

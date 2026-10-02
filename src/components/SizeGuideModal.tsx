@@ -74,7 +74,7 @@ export function SizeGuideModal({
     >
       <div
         id="size-guide-modal"
-        className="w-full max-w-2xl bg-[#FAF8F5] rounded-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+        className="w-full max-w-2xl bg-[#FAF8F5] rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -100,13 +100,13 @@ export function SizeGuideModal({
         </div>
 
         {/* Tabs & Unit Toggle */}
-        <div className="px-5 pt-3 pb-2 border-b border-[#EAE3D7] flex flex-wrap items-center justify-between gap-3 bg-[#F6F2EA]">
-          <div className="flex items-center space-x-1">
+        <div className="px-5 pt-3 pb-3 border-b border-[#EAE3D7] flex flex-wrap items-center justify-between gap-3 bg-[#F6F2EA]">
+          <div className="flex items-center space-x-1.5 bg-white/70 p-1 rounded-full border border-[#E5DFD4]">
             <button
               onClick={() => setActiveTab('chart')}
-              className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors ${
+              className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors ${
                 activeTab === 'chart'
-                  ? 'bg-[#1A1816] text-[#FAF8F5]'
+                  ? 'bg-[#1A1816] text-[#FAF8F5] shadow-xs'
                   : 'text-[#695F54] hover:text-[#1A1816]'
               }`}
             >
@@ -114,9 +114,9 @@ export function SizeGuideModal({
             </button>
             <button
               onClick={() => setActiveTab('my-size')}
-              className={`px-3 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 text-xs font-semibold uppercase tracking-wider rounded-full transition-colors flex items-center gap-1.5 ${
                 activeTab === 'my-size'
-                  ? 'bg-[#A85B3F] text-white'
+                  ? 'bg-[#A85B3F] text-white shadow-xs'
                   : 'text-[#A85B3F] hover:bg-[#A85B3F]/10'
               }`}
             >
@@ -152,7 +152,7 @@ export function SizeGuideModal({
           {activeTab === 'chart' ? (
             <>
               {/* Measurements Table */}
-              <div className="overflow-x-auto border border-[#E3DBCE] rounded-xs bg-white">
+              <div className="overflow-x-auto border border-[#E3DBCE] rounded-2xl bg-white shadow-xs">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#F2ECE1] text-[#2F2924] font-semibold border-b border-[#E3DBCE] uppercase tracking-wider text-[11px]">
                     <tr>
@@ -184,7 +184,7 @@ export function SizeGuideModal({
               </div>
 
               {/* How to Measure note */}
-              <div className="bg-[#F3ECE1]/70 p-4 rounded-xs border border-[#E3DBCE] text-xs text-[#594E44] space-y-2">
+              <div className="bg-[#F3ECE1]/70 p-4 rounded-2xl border border-[#E3DBCE] text-xs text-[#594E44] space-y-2">
                 <span className="font-semibold uppercase tracking-wider text-[10px] text-[#2F2924] block">
                   How to Measure Accurately
                 </span>
@@ -201,7 +201,7 @@ export function SizeGuideModal({
             </>
           ) : (
             /* My Size Finder UX (Master brief placeholder with interactive prototype estimator) */
-            <div className="space-y-5 bg-white p-5 rounded-xs border border-[#E3DBCE]">
+            <div className="space-y-5 bg-white p-6 rounded-2xl border border-[#E3DBCE] shadow-xs">
               <div className="border-b border-[#EFE8DC] pb-3">
                 <span className="text-[10px] uppercase tracking-[0.2em] text-[#A85B3F] font-semibold">
                   Personalized Fit Profile
@@ -263,9 +263,9 @@ export function SizeGuideModal({
                     <button
                       key={fit}
                       onClick={() => setUserFitPreference(fit)}
-                      className={`py-2 px-3 text-xs capitalize rounded-xs border transition-all ${
+                      className={`py-2 px-3 text-xs capitalize rounded-xl border transition-all cursor-pointer ${
                         userFitPreference === fit
-                          ? 'border-[#1A1816] bg-[#1A1816] text-[#FAF8F5] font-semibold'
+                          ? 'border-[#1A1816] bg-[#1A1816] text-[#FAF8F5] font-semibold shadow-xs'
                           : 'border-[#DFD7CB] bg-white text-[#5C534A] hover:border-[#1A1816]'
                       }`}
                     >
@@ -278,13 +278,13 @@ export function SizeGuideModal({
               <button
                 id="btn-calculate-size"
                 onClick={calculateRecommendedSize}
-                className="w-full py-2.5 bg-[#A85B3F] hover:bg-[#8F482F] text-white text-xs uppercase tracking-[0.16em] font-semibold transition-colors rounded-xs shadow-xs"
+                className="w-full py-3 bg-[#A85B3F] hover:bg-[#8F482F] text-white text-xs uppercase tracking-[0.16em] font-semibold transition-all rounded-full shadow-sm cursor-pointer"
               >
                 Calculate My Size
               </button>
 
               {showRecommendation && (
-                <div className="p-4 bg-[#F5EFE4] rounded-xs border border-[#DFD3C2] flex items-center justify-between">
+                <div className="p-4 bg-[#F5EFE4] rounded-2xl border border-[#DFD3C2] flex items-center justify-between">
                   <div>
                     <span className="text-[10px] tracking-wider uppercase text-[#88786B] font-semibold">
                       Recommendation

@@ -86,7 +86,7 @@ export function OrderProgressStepper({ order, className = '' }: OrderProgressSte
   const activePercentage = progressPercentages[currentStepNumber] || 15;
 
   return (
-    <div id="order-progress-stepper" className={`bg-[#FAF7F2] border border-[#E8DFD1] rounded-xs p-5 sm:p-7 shadow-xs ${className}`}>
+    <div id="order-progress-stepper" className={`bg-[#FAF7F2] border border-[#E8DFD1] rounded-3xl p-5 sm:p-7 shadow-xs ${className}`}>
       {/* Header with status badge & milestone message */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 mb-6 border-b border-[#EAE3D7] gap-3">
         <div>
@@ -205,10 +205,10 @@ export function OrderProgressStepper({ order, className = '' }: OrderProgressSte
           key={selectedStep}
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 p-4 bg-[#FFFFFF] border border-[#E8E1D5] rounded-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+          className="mt-6 p-4 bg-[#FFFFFF] border border-[#E8E1D5] rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs"
         >
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-xs bg-[#F5EFE6] text-[#1A1816] shrink-0 mt-0.5">
+            <div className="p-2 rounded-xl bg-[#F5EFE6] text-[#1A1816] shrink-0 mt-0.5">
               <Info className="w-4 h-4 text-[#B2593E]" />
             </div>
             <div>

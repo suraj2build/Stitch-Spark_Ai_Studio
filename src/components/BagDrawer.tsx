@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Heart, Plus, Minus, ArrowRight, ShieldCheck, Tag } from 'lucide-react';
+import { X, Trash2, Heart, Plus, Minus, ArrowRight, ShieldCheck, Tag, Coins } from 'lucide-react';
 import { CartItem, Product } from '../types';
 import { formatPrice } from '../utils/format';
 
@@ -83,7 +83,7 @@ export function BagDrawer({
     >
       <div
         id="bag-drawer-panel"
-        className="w-full max-w-md sm:max-w-lg bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between overflow-hidden"
+        className="w-full max-w-md sm:max-w-lg bg-[#FAF8F5] h-full shadow-2xl flex flex-col justify-between overflow-hidden sm:rounded-l-3xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
@@ -125,7 +125,7 @@ export function BagDrawer({
               </div>
               <div className="w-full bg-[#DDD4C6] h-1.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-[#A85B3F] h-full transition-all duration-300"
+                  className="bg-[var(--color-primary)] h-full transition-all duration-300"
                   style={{
                     width: `${Math.min(100, (subtotal / freeShippingThreshold) * 100)}%`,
                   }}
@@ -145,7 +145,7 @@ export function BagDrawer({
               </p>
               <button
                 onClick={onClose}
-                className="mt-4 px-6 py-2.5 bg-[#1F1C18] text-[#FAF8F5] text-xs uppercase tracking-[0.16em] font-semibold rounded-xs hover:bg-black transition-colors"
+                className="mt-4 px-8 py-3 bg-[#1F1C18] text-[#FAF8F5] text-xs uppercase tracking-[0.16em] font-semibold rounded-full hover:bg-black transition-colors cursor-pointer shadow-xs"
               >
                 Continue Exploring
               </button>
@@ -160,7 +160,7 @@ export function BagDrawer({
                     onSelectProduct(item.product.id);
                     onClose();
                   }}
-                  className="w-20 h-26 object-cover rounded-xs bg-[#EFE9DF] cursor-pointer hover:opacity-90 transition-opacity"
+                  className="w-20 h-26 object-cover rounded-xl bg-[#EFE9DF] cursor-pointer hover:opacity-90 transition-opacity"
                 />
 
                 <div className="flex-1 flex flex-col justify-between">
@@ -203,7 +203,7 @@ export function BagDrawer({
                   {/* Bottom Controls: Quantity & Move to Wishlist */}
                   <div className="flex items-center justify-between pt-2">
                     {/* Quantity Control */}
-                    <div className="flex items-center border border-[#DFD6C8] bg-white rounded-xs">
+                    <div className="flex items-center border border-[#DFD6C8] bg-white rounded-full overflow-hidden">
                       <button
                         onClick={() => onUpdateQuantity(item.id, -1)}
                         className="p-1 hover:bg-[#F2ECE1] transition-colors text-[#5C5146]"
@@ -244,18 +244,18 @@ export function BagDrawer({
             {/* Coupon Code Accordion / Input */}
             <form onSubmit={handleApplyCoupon} className="flex gap-2">
               <div className="relative flex-1">
-                <Tag className="w-3.5 h-3.5 absolute left-2.5 top-3 text-[#9E9184]" />
+                <Tag className="w-3.5 h-3.5 absolute left-3 top-3 text-[#9E9184]" />
                 <input
                   type="text"
                   placeholder="Coupon code (try VANYA10)"
                   value={couponCode}
                   onChange={(e) => setCouponCode(e.target.value)}
-                  className="w-full pl-8 pr-2 py-2 text-xs uppercase tracking-wider bg-[#FAF8F5] border border-[#DDD3C4] rounded-xs focus:outline-none focus:border-[#1A1816]"
+                  className="w-full pl-9 pr-3 py-2 text-xs uppercase tracking-wider bg-[#FAF8F5] border border-[#DDD3C4] rounded-full focus:outline-none focus:border-[#1A1816]"
                 />
               </div>
               <button
                 type="submit"
-                className="px-3 py-2 bg-[#F0EAE0] hover:bg-[#E4DCD0] text-xs font-semibold uppercase tracking-wider text-[#2F2924] rounded-xs transition-colors"
+                className="px-4 py-2 bg-[#F0EAE0] hover:bg-[#E4DCD0] text-xs font-semibold uppercase tracking-wider text-[#2F2924] rounded-full transition-colors cursor-pointer"
               >
                 Apply
               </button>
@@ -295,6 +295,18 @@ export function BagDrawer({
                 <span>Order Total</span>
                 <span>{formatPrice(finalTotal + (isFreeShipping ? 0 : 150))}</span>
               </div>
+
+              {/* Loyalty Points Earned from this order */}
+              <div className="flex items-center justify-between text-xs text-[var(--color-badge-text)] bg-[var(--color-badge-bg)] p-3 rounded-xl border border-[var(--color-border)] mt-2">
+                <span className="flex items-center gap-1.5 font-semibold text-[11px]">
+                  <Coins className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
+                  <span>VANYA Rewards You&apos;ll Earn:</span>
+                </span>
+                <span className="font-bold font-mono text-[var(--color-badge-text)]">
+                  +{Math.floor(subtotal / 10)} Pts
+                </span>
+              </div>
+
               <p className="text-[10px] text-[#9A8F83] text-right">
                 Inclusive of all taxes &amp; duties
               </p>
@@ -304,7 +316,7 @@ export function BagDrawer({
             <button
               id="btn-proceed-checkout"
               onClick={onCheckout}
-              className="w-full py-3.5 bg-[#1F1C18] hover:bg-black text-[#FAF8F5] text-xs uppercase tracking-[0.18em] font-semibold transition-all rounded-xs shadow-md flex items-center justify-center gap-2 group active:scale-[0.99]"
+              className="w-full py-3.5 bg-[var(--color-primary)] hover:bg-[var(--color-primary-hover)] text-white text-xs uppercase tracking-[0.18em] font-semibold transition-all rounded-full shadow-md flex items-center justify-center gap-2 group active:scale-[0.99] cursor-pointer"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />

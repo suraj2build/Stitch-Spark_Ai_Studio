@@ -1,33 +1,33 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Ruler, ShieldCheck, RefreshCw, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Ruler, ShieldCheck, RefreshCw, Sparkles } from 'lucide-react';
 
 export function FitPromiseBanner() {
   const highlights = [
     {
-      icon: <Ruler className="w-5 h-5 text-[#C29B38]" />,
+      icon: <Ruler className="w-5 h-5 text-[var(--color-primary)]" />,
       title: 'Fits Tailored for Indian Bodies',
       desc: 'Engineered proportions, contoured waistbands & no-gape silhouettes',
     },
     {
-      icon: <Sparkles className="w-5 h-5 text-[#C29B38]" />,
+      icon: <Sparkles className="w-5 h-5 text-[var(--color-primary)]" />,
       title: 'Certified Artisanal Handloom',
       desc: 'Pure Chanderi zari, wild tussar & Normandy flax linens',
     },
     {
-      icon: <RefreshCw className="w-5 h-5 text-[#C29B38]" />,
+      icon: <RefreshCw className="w-5 h-5 text-[var(--color-primary)]" />,
       title: '7-Day Doorstep Exchanges',
       desc: 'Complimentary home pickup for instant size & style swaps',
     },
     {
-      icon: <ShieldCheck className="w-5 h-5 text-[#C29B38]" />,
+      icon: <ShieldCheck className="w-5 h-5 text-[var(--color-primary)]" />,
       title: 'COD & Express Dispatch',
       desc: 'Free 48-hour dispatch across 19,000+ Indian postal codes',
     },
   ];
 
   return (
-    <div className="w-full bg-[#FAF9F6] border-y border-[#EFEBE3] py-7 sm:py-8 my-6">
+    <div className="w-full bg-[var(--color-surface)]/40 border-y border-[var(--color-border)] py-7 sm:py-8 my-6">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {highlights.map((item, idx) => (
@@ -39,7 +39,7 @@ export function FitPromiseBanner() {
               transition={{ delay: idx * 0.1, duration: 0.4 }}
               className="flex items-start gap-3.5"
             >
-              <div className="p-2 bg-white rounded-full shadow-xs shrink-0 border border-[#EFECE6]">
+              <div className="p-2 bg-white rounded-full shadow-xs shrink-0 border border-[var(--color-border)]">
                 {item.icon}
               </div>
               <div>

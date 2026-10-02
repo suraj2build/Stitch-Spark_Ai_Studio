@@ -11,6 +11,7 @@ interface ProductCardProps {
   onToggleWishlist: (productId: string) => void;
   onQuickAdd: (product: Product, selectedColor: string) => void;
   onInstantAddSize?: (product: Product, colorName: string, size: string) => void;
+  fitBadge?: { size: string; detail: string };
 }
 
 export function ProductCard({
@@ -20,6 +21,7 @@ export function ProductCard({
   onToggleWishlist,
   onQuickAdd,
   onInstantAddSize,
+  fitBadge,
 }: ProductCardProps) {
   const [selectedColorIndex, setSelectedColorIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -44,14 +46,14 @@ export function ProductCard({
     <motion.div
       whileHover={{ y: -5 }}
       transition={{ duration: 0.28, ease: 'easeOut' }}
-      className="group flex flex-col bg-white rounded-xs overflow-hidden border border-[#F0ECE4] hover:border-[#DFD9CE] hover:shadow-lg transition-all duration-300"
+      className="group flex flex-col bg-white rounded-2xl overflow-hidden border border-[#EFEBE4] hover:border-[#DFD9CE] hover:shadow-xl transition-all duration-300"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Product Image Stage */}
       <div
         onClick={() => onSelectProduct(product.id)}
-        className="relative aspect-[3/4] bg-[#F7F5F0] overflow-hidden cursor-pointer"
+        className="relative aspect-[3/4] bg-[#F7F5F0] overflow-hidden cursor-pointer rounded-t-2xl"
       >
         {/* Primary Image */}
         <img
@@ -75,17 +77,26 @@ export function ProductCard({
           />
         )}
 
-        {/* Top Badges (Discount / BestSeller / New) */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
-          {product.mrp > product.price && (
-            <span className="px-2 py-0.5 bg-[#B2593E] text-white text-[9px] uppercase tracking-wider font-bold rounded-xs shadow-xs">
-              {product.discountPercent}% OFF
+        {/* Top Badges (Discount / BestSeller / New / Tailored Fit) */}
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10 max-w-[80%]">
+          {fitBadge ? (
+            <span className="px-2.5 py-1 bg-[#181716]/95 backdrop-blur-xs text-[#FAF8F5] text-[9px] uppercase tracking-wider font-semibold rounded-full shadow-md border border-[var(--color-primary)] flex items-center gap-1">
+              <span className="text-[var(--color-primary)]">✦</span>
+              <span className="truncate">Matches Size {fitBadge.size} ({fitBadge.detail})</span>
             </span>
-          )}
-          {product.badges?.includes('BESTSELLER') && (
-            <span className="px-2 py-0.5 bg-[#161514] text-white text-[9px] uppercase tracking-wider font-semibold rounded-xs shadow-xs">
-              BESTSELLER
-            </span>
+          ) : (
+            <>
+              {product.mrp > product.price && (
+                <span className="px-2.5 py-0.8 bg-[var(--color-primary,#947055)] text-white text-[9px] uppercase tracking-wider font-semibold rounded-full shadow-xs">
+                  {product.discountPercent}% OFF
+                </span>
+              )}
+              {product.badges?.includes('BESTSELLER') && (
+                <span className="px-2.5 py-0.8 bg-[#25201B] text-white text-[9px] uppercase tracking-wider font-semibold rounded-full shadow-xs">
+                  BESTSELLER
+                </span>
+              )}
+            </>
           )}
         </div>
 
@@ -96,21 +107,23 @@ export function ProductCard({
             e.stopPropagation();
             onToggleWishlist(product.id);
           }}
-          className="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/90 hover:bg-white text-[#161514] shadow-xs z-10 transition-colors"
+          className="absolute top-2.5 right-2.5 p-2 rounded-full bg-white/90 hover:bg-white text-[#161514] shadow-xs z-10 transition-colors cursor-pointer"
           aria-label="Wishlist"
         >
           <Heart
             className={`w-4 h-4 stroke-[1.5] transition-colors ${
-              isWishlisted ? 'fill-[#B2593E] text-[#B2593E]' : 'text-[#4A4540] hover:text-[#B2593E]'
+              isWishlisted
+                ? 'fill-[var(--color-primary,#947055)] text-[var(--color-primary,#947055)]'
+                : 'text-[#4A4540] hover:text-[var(--color-primary,#947055)]'
             }`}
           />
         </motion.button>
 
-        {/* Quick Size Bar on Hover (FableStreet / Uptownie style) */}
-        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-xs p-2.5 border-t border-[#EFEBE3] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
-          <div className="flex items-center justify-between text-[10px] text-[#706860] mb-1 font-semibold uppercase tracking-wider">
+        {/* Quick Size Bar on Hover */}
+        <div className="absolute bottom-0 inset-x-0 bg-white/95 backdrop-blur-xs p-2.5 border-t border-[var(--color-border)] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-10">
+          <div className="flex items-center justify-between text-[10px] text-[#706860] mb-1.5 font-semibold uppercase tracking-wider">
             <span>Instant Select Size</span>
-            <span className="text-[#B2593E]">Quick Add</span>
+            <span className="text-[var(--color-primary)]">Quick Add</span>
           </div>
           <div className="flex gap-1.5 justify-between">
             {product.sizes.map((s) => (
@@ -118,12 +131,12 @@ export function ProductCard({
                 key={s.size}
                 disabled={!s.inStock}
                 onClick={(e) => handleSizeClick(e, s.size)}
-                className={`flex-1 py-1.5 text-[11px] font-semibold rounded-xs transition-all ${
+                className={`flex-1 py-1.5 text-[11px] font-semibold rounded-xl transition-all ${
                   !s.inStock
                     ? 'bg-[#F2ECE3] text-[#B5ACA0] cursor-not-allowed line-through'
                     : addedSize === s.size
-                    ? 'bg-[#2D5A46] text-white'
-                    : 'bg-[#FAF8F5] hover:bg-[#161514] hover:text-white border border-[#E5DFD4] text-[#2E2A27]'
+                    ? 'bg-[var(--color-primary)] text-white'
+                    : 'bg-[#FAF8F5] hover:bg-[var(--color-primary)] hover:text-white border border-[#E5DFD4] text-[#2E2A27]'
                 }`}
               >
                 {addedSize === s.size ? <Check className="w-3 h-3 mx-auto" /> : s.size}
@@ -134,15 +147,15 @@ export function ProductCard({
       </div>
 
       {/* Product Details Section */}
-      <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between bg-white">
+      <div className="p-3 sm:p-4 flex flex-col flex-1 justify-between bg-white border-t border-[var(--color-border)]">
         <div>
           {/* Fabric & Rating */}
           <div className="flex items-center justify-between text-[11px] text-[#8C8379] mb-1">
             <span className="uppercase tracking-wider truncate max-w-[140px] font-medium">
               {product.fabric.split(' ')[0]} {product.fabric.split(' ')[1] || ''}
             </span>
-            <div className="flex items-center gap-1 text-[#C29B38] font-semibold text-[10px]">
-              <Star className="w-3 h-3 fill-[#C29B38]" />
+            <div className="flex items-center gap-1 text-[var(--color-primary)] font-semibold text-[10px]">
+              <Star className="w-3 h-3 fill-[var(--color-primary)]" />
               <span>{product.rating}</span>
             </div>
           </div>
@@ -150,7 +163,7 @@ export function ProductCard({
           {/* Title */}
           <h3
             onClick={() => onSelectProduct(product.id)}
-            className="text-xs sm:text-sm font-medium text-[#181716] group-hover:text-[#B2593E] transition-colors line-clamp-1 cursor-pointer"
+            className="text-xs sm:text-sm font-medium text-[#181716] group-hover:text-[var(--color-primary)] transition-colors line-clamp-1 cursor-pointer"
           >
             {product.title}
           </h3>

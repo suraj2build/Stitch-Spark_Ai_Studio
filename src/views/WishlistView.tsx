@@ -51,7 +51,7 @@ export function WishlistView({
           </p>
           <button
             onClick={onNavigateToCatalog}
-            className="mt-2 inline-flex items-center gap-2 px-6 py-3 bg-[#1A1816] text-white text-xs uppercase tracking-[0.16em] font-semibold rounded-xs hover:bg-black"
+            className="mt-2 inline-flex items-center gap-2 px-8 py-3.5 bg-[#1A1816] text-white text-xs uppercase tracking-[0.16em] font-semibold rounded-full hover:bg-black transition-all cursor-pointer shadow-md"
           >
             <span>Explore The Collection</span>
             <ArrowRight className="w-4 h-4" />
@@ -66,13 +66,13 @@ export function WishlistView({
             return (
               <div
                 key={product.id}
-                className="bg-[#FAF7F2] border border-[#E8E1D5] rounded-xs overflow-hidden flex flex-col justify-between"
+                className="bg-[#FAF7F2] border border-[#E8E1D5] rounded-2xl overflow-hidden flex flex-col justify-between shadow-xs hover:shadow-md transition-shadow"
               >
                 <div>
                   {/* Image */}
                   <div
                     onClick={() => onSelectProduct(product.id)}
-                    className="aspect-[3/4] bg-[#EFE9DF] overflow-hidden cursor-pointer relative group"
+                    className="aspect-[3/4] bg-[#EFE9DF] overflow-hidden cursor-pointer relative group rounded-t-2xl"
                   >
                     <img
                       src={defaultColor.images[0]}
@@ -84,7 +84,7 @@ export function WishlistView({
                         e.stopPropagation();
                         onRemoveFromWishlist(product.id);
                       }}
-                      className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full text-[#6E6358] hover:text-[#962E3B] transition-colors shadow-xs"
+                      className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white rounded-full text-[#6E6358] hover:text-[#962E3B] transition-colors shadow-xs cursor-pointer"
                       title="Remove"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -120,7 +120,7 @@ export function WishlistView({
                       onMoveToBag(product, defaultColor.name, defaultSize);
                       onRemoveFromWishlist(product.id);
                     }}
-                    className="w-full py-2.5 bg-[#1F1C18] hover:bg-black text-[#FAF8F5] text-[11px] uppercase tracking-wider font-semibold rounded-xs transition-colors flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 bg-[#1F1C18] hover:bg-black text-[#FAF8F5] text-[11px] uppercase tracking-wider font-semibold rounded-full transition-colors flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
                   >
                     <ShoppingBag className="w-3.5 h-3.5" />
                     <span>Move to Bag ({defaultSize})</span>

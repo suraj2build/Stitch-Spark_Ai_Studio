@@ -1,80 +1,59 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, X, ChevronRight, Truck, RefreshCw, Gift } from 'lucide-react';
+import React from 'react';
 
 interface AnnouncementBarProps {
-  onPromoClick?: () => void;
+  gender?: 'men' | 'women';
+  onNavigate?: (route: string) => void;
 }
 
-export function AnnouncementBar({ onPromoClick }: AnnouncementBarProps) {
-  const [isVisible, setIsVisible] = useState(true);
-  const [activeMessageIndex, setActiveMessageIndex] = useState(0);
-
-  const messages = [
-    {
-      icon: <Sparkles className="w-3 h-3 text-[#E8D09E] shrink-0" />,
-      text: (
-        <span>
-          Festive Offer: Enjoy Flat 10% Off your first luxury purchase • Use Code{' '}
-          <strong className="underline underline-offset-2 font-bold tracking-widest text-[#E8D09E]">
-            VANYA10
-          </strong>
-        </span>
-      ),
-    },
-    {
-      icon: <Truck className="w-3 h-3 text-[#E8D09E] shrink-0" />,
-      text: <span>Complimentary Pan-India Express Delivery on all orders above ₹1,999</span>,
-    },
-    {
-      icon: <RefreshCw className="w-3 h-3 text-[#E8D09E] shrink-0" />,
-      text: <span>Tailored For Indian Bodies • 7-Day Hassle-Free Doorstep Size Exchanges</span>,
-    },
-  ];
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveMessageIndex((prev) => (prev + 1) % messages.length);
-    }, 4500);
-    return () => clearInterval(timer);
-  }, [messages.length]);
-
-  if (!isVisible) return null;
-
+export function AnnouncementBar({ gender = 'men', onNavigate }: AnnouncementBarProps) {
   return (
     <div
       id="announcement-bar"
-      className="bg-[#181716] text-[#FAF9F6] text-xs py-2 px-4 relative z-40 border-b border-black/20"
+      className="bg-[#111111] text-[#E5DFD7] text-[10px] sm:text-[11px] py-2 px-4 sm:px-8 relative z-40 border-b border-white/10 select-none"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        <div className="hidden sm:block w-6" />
-
-        <div className="flex-1 overflow-hidden h-5 flex items-center justify-center">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeMessageIndex}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.35, ease: 'easeInOut' }}
-              className="flex items-center justify-center gap-2 tracking-wider font-normal text-[11px] sm:text-xs text-center cursor-pointer"
-              onClick={onPromoClick}
-            >
-              {messages[activeMessageIndex].icon}
-              <div className="truncate">{messages[activeMessageIndex].text}</div>
-            </motion.div>
-          </AnimatePresence>
+      <div className="max-w-7xl mx-auto flex items-center justify-between tracking-[0.20em] uppercase font-light">
+        {/* Left: Shipping perk */}
+        <div className="hidden md:block">
+          <span className="text-[#CFC6BA]">FREE DELIVERY ON ORDERS ABOVE ₹999</span>
         </div>
 
-        <button
-          id="btn-close-announcement"
-          onClick={() => setIsVisible(false)}
-          className="text-[#A89F95] hover:text-white transition-colors p-0.5 rounded focus:outline-none"
-          aria-label="Close announcement"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+        {/* Center: Brand declaration */}
+        <div className="mx-auto md:mx-0 text-center font-normal text-white tracking-[0.24em]">
+          <span>
+            {gender === 'men'
+              ? 'A MODERN INDIAN MENSWEAR BRAND'
+              : 'A MODERN INDIAN WOMENSWEAR ATELIER'}
+          </span>
+        </div>
+
+        {/* Right: Quick utility links */}
+        <div className="hidden sm:flex items-center gap-3 text-[#A89E92] font-light">
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('order-status')}
+            className="hover:text-white transition-colors cursor-pointer"
+          >
+            TRACK ORDER
+          </button>
+          <span className="text-white/20">|</span>
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('plp')}
+            className="hover:text-white transition-colors cursor-pointer"
+          >
+            STORES
+          </button>
+          <span className="text-white/20">|</span>
+          <button
+            type="button"
+            onClick={() => onNavigate && onNavigate('order-status')}
+            className="hover:text-white transition-colors cursor-pointer"
+          >
+            HELP
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+

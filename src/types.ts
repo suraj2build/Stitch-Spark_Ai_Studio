@@ -1,5 +1,24 @@
 export type Gender = 'women' | 'men' | 'all';
 
+export interface GarmentDimensions {
+  shoulder: number; // in inches
+  chest: number; // in inches (chest or bust)
+  waist?: number; // in inches
+  inseam?: number; // in inches (for trousers, sets, pajamas)
+  length?: number; // in inches (garment vertical drop)
+}
+
+export interface FitFilterCriteria {
+  unit: 'in' | 'cm';
+  shoulder?: number; // target shoulder width
+  chest?: number; // target chest/bust circumference
+  waist?: number; // target waist
+  inseam?: number; // target inseam length
+  length?: number; // target garment length
+  tolerance?: number; // tolerance margin (default +/- 1 inch)
+  easePreference?: 'tailored' | 'classic' | 'relaxed';
+}
+
 export interface ColorVariant {
   name: string;
   hex: string;
@@ -43,7 +62,7 @@ export interface Product {
   fabric: string;
   care: string[];
   occasion: string;
-  badges?: ('NEW' | 'BESTSELLER' | 'LIMITED' | 'LOW STOCK')[];
+  badges?: ('NEW' | 'BESTSELLER' | 'LIMITED' | 'LOW STOCK' | 'POPULAR' | 'EXCLUSIVE' | 'LIMITED EDITION')[];
   rating: number;
   reviewCount: number;
   modelInfo: {

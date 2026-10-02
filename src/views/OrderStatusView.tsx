@@ -19,6 +19,7 @@ import {
   ArrowRight,
   ExternalLink,
   Sparkles,
+  X,
 } from 'lucide-react';
 import { CustomerOrder, OrderProgressStepKey } from '../types';
 import { MOCK_ORDERS, lookupCustomerOrder } from '../data/mockOrders';
@@ -45,6 +46,7 @@ export function OrderStatusView({
   const [copiedTracking, setCopiedTracking] = useState(false);
   const [copiedOrderId, setCopiedOrderId] = useState(false);
   const [invoiceDownloaded, setInvoiceDownloaded] = useState(false);
+  const [showConciergeModal, setShowConciergeModal] = useState(false);
 
   // Initialize with initial order or default demo order
   useEffect(() => {
@@ -138,7 +140,7 @@ export function OrderStatusView({
       </div>
 
       {/* Order Lookup Search Card */}
-      <div className="bg-[#FAF7F2] border border-[#E8DFD1] rounded-xs p-6 mb-10 shadow-xs">
+      <div className="bg-[#FAF7F2] border border-[#E8DFD1] rounded-2xl p-6 mb-10 shadow-xs">
         <div className="max-w-3xl">
           <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#8C7A6B] block mb-1">
             Track Existing Dispatch
@@ -169,7 +171,7 @@ export function OrderStatusView({
                       setOrderIdInput(e.target.value);
                       if (searchError) setSearchError(null);
                     }}
-                    className="w-full bg-white border border-[#DDD5C7] pl-9 pr-3 py-2.5 text-xs text-[#1A1816] placeholder:text-[#9A8F83] rounded-xs focus:outline-none focus:border-[#B2593E] focus:ring-1 focus:ring-[#B2593E]"
+                    className="w-full bg-white border border-[#DDD5C7] pl-9 pr-3 py-2.5 text-xs text-[#1A1816] placeholder:text-[#9A8F83] rounded-xl focus:outline-none focus:border-[#B2593E] focus:ring-1 focus:ring-[#B2593E]"
                   />
                 </div>
               </div>
@@ -194,7 +196,7 @@ export function OrderStatusView({
                       setEmailInput(e.target.value);
                       if (searchError) setSearchError(null);
                     }}
-                    className="w-full bg-white border border-[#DDD5C7] pl-9 pr-3 py-2.5 text-xs text-[#1A1816] placeholder:text-[#9A8F83] rounded-xs focus:outline-none focus:border-[#B2593E] focus:ring-1 focus:ring-[#B2593E]"
+                    className="w-full bg-white border border-[#DDD5C7] pl-9 pr-3 py-2.5 text-xs text-[#1A1816] placeholder:text-[#9A8F83] rounded-xl focus:outline-none focus:border-[#B2593E] focus:ring-1 focus:ring-[#B2593E]"
                   />
                 </div>
               </div>
@@ -207,7 +209,7 @@ export function OrderStatusView({
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="p-3 bg-[#FDF2F0] border border-[#F4C6BE] rounded-xs text-xs text-[#B23825] flex items-start gap-2"
+                  className="p-3 bg-[#FDF2F0] border border-[#F4C6BE] rounded-2xl text-xs text-[#B23825] flex items-start gap-2"
                 >
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <div>
@@ -223,7 +225,7 @@ export function OrderStatusView({
                 id="btn-track-order-submit"
                 type="submit"
                 disabled={isSearching}
-                className="px-6 py-2.5 bg-[#1A1816] hover:bg-black text-[#FAF8F5] text-xs uppercase tracking-[0.16em] font-semibold rounded-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 shadow-xs"
+                className="px-6 py-2.5 bg-[#1A1816] hover:bg-black text-[#FAF8F5] text-xs uppercase tracking-[0.16em] font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 shadow-xs"
               >
                 {isSearching ? (
                   <>
@@ -267,7 +269,7 @@ export function OrderStatusView({
       {activeOrder ? (
         <div className="space-y-8">
           {/* Top Order Summary Header */}
-          <div className="bg-white border border-[#EAE3D7] rounded-xs p-5 sm:p-7 shadow-xs">
+          <div className="bg-white border border-[#EAE3D7] rounded-2xl p-5 sm:p-7 shadow-xs">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between pb-5 border-b border-[#F0ECE4] gap-4">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
@@ -277,7 +279,7 @@ export function OrderStatusView({
                   <button
                     type="button"
                     onClick={() => handleCopyOrderId(activeOrder.id)}
-                    className="p-1 text-[#8C7E72] hover:text-[#1A1816] transition-colors rounded-xs"
+                    className="p-1 text-[#8C7E72] hover:text-[#1A1816] transition-colors rounded-xl"
                     title="Copy Order ID"
                   >
                     {copiedOrderId ? (
@@ -319,7 +321,7 @@ export function OrderStatusView({
                 <button
                   type="button"
                   onClick={handleDownloadInvoice}
-                  className="px-3.5 py-2 bg-[#FAF7F2] hover:bg-[#F2ECE1] border border-[#DDD5C7] text-[#1A1816] text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-3.5 py-2 bg-[#FAF7F2] hover:bg-[#F2ECE1] border border-[#DDD5C7] text-[#1A1816] text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5 text-[#8C7A6B]" />
                   <span>{invoiceDownloaded ? 'Invoice Saved ✓' : 'Tax Invoice'}</span>
@@ -327,8 +329,8 @@ export function OrderStatusView({
 
                 <button
                   type="button"
-                  onClick={() => alert(`Artisan Concierge Assistance for order ${activeOrder.id}:\n\nOur Jaipur atelier desk is on standby for styling assistance, doorstep fitting alteration, or express delivery inquiries.\n\nDirect Phone: +91 141 289 4000\nWhatsApp: +91 98290 12000`)}
-                  className="px-3.5 py-2 bg-[#1A1816] hover:bg-black text-[#FAF8F5] text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                  onClick={() => setShowConciergeModal(true)}
+                  className="px-3.5 py-2 bg-[#1A1816] hover:bg-black text-[#FAF8F5] text-xs font-semibold uppercase tracking-wider rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
                 >
                   <Phone className="w-3.5 h-3.5" />
                   <span>Concierge Help</span>
@@ -367,7 +369,7 @@ export function OrderStatusView({
             {/* Left Column: Courier Logistics & Activity Log (7 cols) */}
             <div className="lg:col-span-7 space-y-6">
               {/* Courier & Transit Details Card */}
-              <div className="bg-white border border-[#EAE3D7] rounded-xs p-6 shadow-xs space-y-4">
+              <div className="bg-white border border-[#EAE3D7] rounded-2xl p-6 shadow-xs space-y-4">
                 <div className="flex items-center justify-between border-b border-[#F0ECE4] pb-3">
                   <div className="flex items-center gap-2">
                     <Truck className="w-4 h-4 text-[#B2593E]" />
@@ -395,7 +397,7 @@ export function OrderStatusView({
                       Airway Bill (AWB) Tracking No.
                     </span>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="font-mono text-xs font-semibold text-[#1A1816] bg-[#FAF8F5] px-2 py-0.5 rounded-xs border border-[#EAE3D7]">
+                      <span className="font-mono text-xs font-semibold text-[#1A1816] bg-[#FAF8F5] px-2 py-0.5 rounded-2xl border border-[#EAE3D7]">
                         {activeOrder.carrier.trackingNumber}
                       </span>
                       <button
@@ -421,7 +423,7 @@ export function OrderStatusView({
                   )}
 
                   {activeOrder.carrier.assignedRider && (
-                    <div className="sm:col-span-2 bg-[#FAF7F2] border border-[#EAE3D7] p-3 rounded-xs flex items-center justify-between">
+                    <div className="sm:col-span-2 bg-[#FAF7F2] border border-[#EAE3D7] p-3 rounded-2xl flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 rounded-full bg-[#1A1816] text-white flex items-center justify-center text-xs">
                           <User className="w-3.5 h-3.5" />
@@ -437,7 +439,7 @@ export function OrderStatusView({
                       </div>
                       <a
                         href={`tel:${activeOrder.carrier.assignedRider.phone}`}
-                        className="px-2.5 py-1 bg-white border border-[#DDD5C7] text-[#1A1816] hover:bg-[#F2ECE1] rounded-xs font-semibold text-[11px] uppercase tracking-wider transition-colors"
+                        className="px-2.5 py-1 bg-white border border-[#DDD5C7] text-[#1A1816] hover:bg-[#F2ECE1] rounded-full font-semibold text-[11px] uppercase tracking-wider transition-colors"
                       >
                         Call Associate
                       </a>
@@ -447,7 +449,7 @@ export function OrderStatusView({
               </div>
 
               {/* Full Detailed Activity Timeline */}
-              <div className="bg-white border border-[#EAE3D7] rounded-xs p-6 shadow-xs">
+              <div className="bg-white border border-[#EAE3D7] rounded-2xl p-6 shadow-xs">
                 <div className="flex items-center gap-2 border-b border-[#F0ECE4] pb-3 mb-5">
                   <Clock className="w-4 h-4 text-[#B2593E]" />
                   <h3 className="font-editorial text-lg text-[#1A1816] font-normal">
@@ -499,7 +501,7 @@ export function OrderStatusView({
             {/* Right Column: Garment Items, Shipping Address & Payment (5 cols) */}
             <div className="lg:col-span-5 space-y-6">
               {/* Ordered Items Summary */}
-              <div className="bg-white border border-[#EAE3D7] rounded-xs p-6 shadow-xs space-y-4">
+              <div className="bg-white border border-[#EAE3D7] rounded-2xl p-6 shadow-xs space-y-4">
                 <div className="flex items-center justify-between border-b border-[#F0ECE4] pb-3">
                   <h3 className="font-editorial text-lg text-[#1A1816] font-normal">
                     Order Items ({activeOrder.items.length})
@@ -515,7 +517,7 @@ export function OrderStatusView({
                       <img
                         src={item.image}
                         alt={item.title}
-                        className="w-16 h-20 object-cover rounded-xs border border-[#EAE3D7] shrink-0"
+                        className="w-16 h-20 object-cover rounded-2xl border border-[#EAE3D7] shrink-0"
                       />
                       <div className="flex-1 min-w-0">
                         <h4 className="text-xs font-semibold text-[#1A1816] leading-tight truncate">
@@ -545,7 +547,7 @@ export function OrderStatusView({
               </div>
 
               {/* Shipping Address & Recipient Card */}
-              <div className="bg-white border border-[#EAE3D7] rounded-xs p-6 shadow-xs space-y-3">
+              <div className="bg-white border border-[#EAE3D7] rounded-2xl p-6 shadow-xs space-y-3">
                 <div className="flex items-center gap-2 border-b border-[#F0ECE4] pb-3">
                   <MapPin className="w-4 h-4 text-[#B2593E]" />
                   <h3 className="font-editorial text-lg text-[#1A1816] font-normal">
@@ -570,7 +572,7 @@ export function OrderStatusView({
               </div>
 
               {/* Payment Summary */}
-              <div className="bg-white border border-[#EAE3D7] rounded-xs p-6 shadow-xs space-y-3">
+              <div className="bg-white border border-[#EAE3D7] rounded-2xl p-6 shadow-xs space-y-3">
                 <div className="flex items-center gap-2 border-b border-[#F0ECE4] pb-3">
                   <CreditCard className="w-4 h-4 text-[#B2593E]" />
                   <h3 className="font-editorial text-lg text-[#1A1816] font-normal">
@@ -609,6 +611,72 @@ export function OrderStatusView({
           </div>
         </div>
       ) : null}
+      {/* ARTISAN CONCIERGE MODAL */}
+      {showConciergeModal && activeOrder && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          onClick={() => setShowConciergeModal(false)}
+        >
+          <div
+            className="w-full max-w-md bg-[#FAF8F5] rounded-3xl p-6 sm:p-7 shadow-2xl border border-[#EAE3D7] space-y-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-[#EAE3D7]">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-[#1A1816] text-[#FAF8F5] flex items-center justify-center">
+                  <Phone className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-editorial text-lg text-[#1A1816]">Artisan Concierge</h3>
+                  <p className="text-[11px] text-[#8C7A6B]">Order #{activeOrder.id}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowConciergeModal(false)}
+                className="p-1.5 text-[#8C7E72] hover:text-[#1A1816] rounded-full transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#5C534A] leading-relaxed">
+              Our Jaipur atelier styling desk is on standby for personal styling guidance, complimentary doorstep fitting alterations, or priority delivery schedule inquiries.
+            </p>
+
+            <div className="space-y-2.5">
+              <div className="p-3.5 bg-white border border-[#E8E1D5] rounded-2xl flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8C7A6B] block">Direct Atelier Line</span>
+                  <span className="text-xs font-semibold text-[#1A1816] font-mono">+91 141 289 4000</span>
+                </div>
+                <a
+                  href="tel:+911412894000"
+                  className="px-3 py-1.5 bg-[#FAF7F2] hover:bg-[#F2ECE1] border border-[#DDD5C7] rounded-xl text-xs font-semibold text-[#1A1816] transition-colors"
+                >
+                  Call Now
+                </a>
+              </div>
+
+              <div className="p-3.5 bg-white border border-[#E8E1D5] rounded-2xl flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] uppercase tracking-wider font-semibold text-[#8C7A6B] block">WhatsApp Concierge</span>
+                  <span className="text-xs font-semibold text-[#1A1816] font-mono">+91 98290 12000</span>
+                </div>
+                <span className="px-3 py-1.5 bg-[#E8F2EA] text-[#285832] rounded-xl text-xs font-semibold">
+                  Online
+                </span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowConciergeModal(false)}
+              className="w-full py-3 bg-[#1A1816] hover:bg-black text-[#FAF8F5] text-xs uppercase tracking-[0.16em] font-semibold rounded-full transition-colors cursor-pointer"
+            >
+              Close Concierge
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

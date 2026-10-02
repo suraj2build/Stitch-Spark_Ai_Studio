@@ -136,7 +136,7 @@ export function ReelsView({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Main 9:16 Vertical Video Frame */}
           <div className="lg:col-span-7 flex justify-center">
-            <div className="relative w-full max-w-[380px] sm:max-w-[420px] aspect-[9/16] bg-black rounded-lg overflow-hidden shadow-2xl border border-[#2B2621]">
+            <div className="relative w-full max-w-[380px] sm:max-w-[420px] aspect-[9/16] bg-black rounded-2xl overflow-hidden shadow-2xl border border-[#2B2621]">
               {/* HTML5 Video or Poster fallback */}
               {currentReel.videoUrl ? (
                 <video
@@ -243,18 +243,18 @@ export function ReelsView({
                       <div
                         key={p.id}
                         onClick={() => openProductMiniSheet(p)}
-                        className="flex items-center gap-2 bg-white/95 text-[#1A1816] p-2 rounded-xs shrink-0 cursor-pointer hover:bg-white transition-all shadow-md active:scale-95"
+                        className="flex items-center gap-2 bg-white/95 text-[#1A1816] p-2 rounded-xl shrink-0 cursor-pointer hover:bg-white transition-all shadow-md active:scale-95"
                       >
                         <img
                           src={p.colors[0].images[0]}
                           alt={p.title}
-                          className="w-10 h-12 object-cover rounded-xs bg-[#EFE9DF]"
+                          className="w-10 h-12 object-cover rounded-xl bg-[#EFE9DF]"
                         />
                         <div className="text-left">
                           <p className="text-[11px] font-semibold line-clamp-1 w-28">
                             {p.title}
                           </p>
-                          <p className="text-xs font-bold text-[#A85B3F]">
+                          <p className="text-xs font-bold text-[var(--color-primary)]">
                             {formatPrice(p.price)}
                           </p>
                           <span className="text-[9px] text-[#554C42] uppercase tracking-wider font-semibold">
@@ -271,10 +271,10 @@ export function ReelsView({
 
           {/* RIGHT: Desktop Tagged Product Rack & Detail View */}
           <div className="lg:col-span-5 space-y-4">
-            <div className="bg-[#1C1815] p-5 rounded-xs border border-[#2B2621]">
+            <div className="bg-[#1C1815] p-5 rounded-2xl border border-[#2B2621]">
               <div className="flex items-center justify-between pb-3 border-b border-[#2E2823]">
                 <div className="flex items-center gap-2">
-                  <ShoppingBag className="w-4 h-4 text-[#D4AF37]" />
+                  <ShoppingBag className="w-4 h-4 text-[var(--color-primary)]" />
                   <h4 className="text-xs uppercase tracking-[0.2em] font-semibold text-[#EDE6DC]">
                     Tagged Garments in This Reel
                   </h4>
@@ -292,12 +292,12 @@ export function ReelsView({
                         src={p.colors[0].images[0]}
                         alt={p.title}
                         onClick={() => onSelectProduct(p.id)}
-                        className="w-16 h-20 object-cover rounded-xs bg-[#24201C] cursor-pointer hover:opacity-90"
+                        className="w-16 h-20 object-cover rounded-xl bg-[#24201C] cursor-pointer hover:opacity-90"
                       />
                       <div>
                         <h5
                           onClick={() => onSelectProduct(p.id)}
-                          className="text-xs sm:text-sm font-medium text-white hover:text-[#D4AF37] cursor-pointer"
+                          className="text-xs sm:text-sm font-medium text-white hover:text-[var(--color-primary)] cursor-pointer"
                         >
                           {p.title}
                         </h5>
@@ -318,13 +318,13 @@ export function ReelsView({
                     <div className="flex flex-col items-end gap-1.5 shrink-0">
                       <button
                         onClick={() => openProductMiniSheet(p)}
-                        className="px-3.5 py-2 bg-[#FAF8F5] hover:bg-white text-[#1A1816] text-[11px] uppercase tracking-wider font-semibold rounded-xs transition-colors"
+                        className="px-4 py-2 bg-[#FAF8F5] hover:bg-white text-[#1A1816] text-[11px] uppercase tracking-wider font-semibold rounded-full transition-colors cursor-pointer"
                       >
                         Quick Buy
                       </button>
                       <button
                         onClick={() => onSelectProduct(p.id)}
-                        className="text-[10px] text-[#A89C8F] hover:text-white underline"
+                        className="text-[10px] text-[#A89C8F] hover:text-white underline cursor-pointer"
                       >
                         Full Details
                       </button>
@@ -335,7 +335,7 @@ export function ReelsView({
             </div>
 
             {/* Reel Carousel Selector (Thumbnails) */}
-            <div className="bg-[#1C1815] p-5 rounded-xs border border-[#2B2621]">
+            <div className="bg-[#1C1815] p-5 rounded-2xl border border-[#2B2621]">
               <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#8C7F72] block mb-3">
                 Explore All Shoppable Reels
               </span>
@@ -347,14 +347,14 @@ export function ReelsView({
                       setActiveReelIndex(idx);
                       setSheetOpen(false);
                     }}
-                    className={`aspect-[9/16] rounded-xs overflow-hidden cursor-pointer border-2 transition-all relative ${
+                    className={`aspect-[9/16] rounded-xl overflow-hidden cursor-pointer border-2 transition-all relative ${
                       activeReelIndex === idx
                         ? 'border-[#D4AF37] scale-102'
                         : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
                   >
                     <img src={r.thumbnail} alt={r.title} className="w-full h-full object-cover" />
-                    <div className="absolute bottom-1 right-1 text-[8px] bg-black/60 px-1 rounded-xs">
+                    <div className="absolute bottom-1 right-1 text-[8px] bg-black/60 px-1.5 py-0.5 rounded-full">
                       {r.views}
                     </div>
                   </div>
@@ -374,7 +374,7 @@ export function ReelsView({
         >
           <div
             id="reel-product-sheet"
-            className="w-full sm:max-w-md bg-[#FAF8F5] text-[#1A1816] rounded-t-xl sm:rounded-lg p-5 shadow-2xl"
+            className="w-full sm:max-w-md bg-[#FAF8F5] text-[#1A1816] rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Sheet Header */}
@@ -383,7 +383,7 @@ export function ReelsView({
                 <img
                   src={selectedProductForSheet.colors[0].images[0]}
                   alt={selectedProductForSheet.title}
-                  className="w-14 h-18 object-cover rounded-xs bg-[#EFE9DF]"
+                  className="w-14 h-18 object-cover rounded-xl bg-[#EFE9DF]"
                 />
                 <div>
                   <span className="text-[10px] uppercase tracking-[0.2em] font-semibold text-[#A85B3F]">
@@ -446,7 +446,7 @@ export function ReelsView({
                     key={s.size}
                     disabled={!s.inStock}
                     onClick={() => setSheetSize(s.size)}
-                    className={`py-2 text-xs font-semibold rounded-xs border transition-all ${
+                    className={`py-2 text-xs font-semibold rounded-full border transition-all ${
                       !s.inStock
                         ? 'border-[#EAE3D7] bg-[#F2ECE1] text-[#A6998C] line-through'
                         : sheetSize === s.size
@@ -464,7 +464,7 @@ export function ReelsView({
             <div className="mt-6 flex gap-2">
               <button
                 onClick={handleSheetAddToCart}
-                className={`flex-1 py-3 px-4 text-xs font-semibold uppercase tracking-[0.16em] rounded-xs transition-all flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3 px-4 text-xs font-semibold uppercase tracking-[0.16em] rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   addedItemConfirm
                     ? 'bg-[#3F6A48] text-white'
                     : 'bg-[#1F1C18] text-white hover:bg-black'
@@ -485,7 +485,7 @@ export function ReelsView({
                   onSelectProduct(selectedProductForSheet.id);
                   setSheetOpen(false);
                 }}
-                className="px-4 py-3 border border-[#1A1816] text-[#1A1816] text-xs uppercase tracking-wider font-semibold rounded-xs hover:bg-[#1A1816] hover:text-white transition-colors"
+                className="px-5 py-3 border border-[#1A1816] text-[#1A1816] text-xs uppercase tracking-wider font-semibold rounded-full hover:bg-[#1A1816] hover:text-white transition-colors cursor-pointer"
               >
                 PDP
               </button>

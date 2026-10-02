@@ -19,6 +19,14 @@ import {
 import { Product, Review } from '../types';
 import { ProductCard } from '../components/ProductCard';
 import { formatPrice } from '../utils/format';
+import {
+  ContextualLightingControl,
+  LightingMode,
+  LIGHTING_CONFIGS,
+} from '../components/ContextualLightingControl';
+import { DigitalProductPassportModal } from '../components/DigitalProductPassportModal';
+import { DigitalProductPassportBadge } from '../components/DigitalProductPassportBadge';
+import { ShopTheCompleteLook } from '../components/ShopTheCompleteLook';
 
 interface PdpViewProps {
   product: Product;
@@ -58,6 +66,11 @@ export function PdpView({
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [zoomModalOpen, setZoomModalOpen] = useState(false);
 
+  // Next-Gen Features: Contextual Lighting & Digital Product Passport
+  const [lightingMode, setLightingMode] = useState<LightingMode>('daylight');
+  const [passportModalOpen, setPassportModalOpen] = useState(false);
+  const lightingConfig = LIGHTING_CONFIGS[lightingMode];
+
   // Pincode Delivery State
   const [pincode, setPincode] = useState('');
   const [pincodeStatus, setPincodeStatus] = useState<'idle' | 'checking' | 'deliverable' | 'undeliverable'>('idle');
@@ -82,13 +95,91 @@ export function PdpView({
     bundleCandidates[0]?.id || '',
   ].filter(Boolean));
 
-  // Write Review Modal
+  // Dynamic Reviews & Star Rating System
+  const [reviews, setReviews] = useState<Review[]>(product.reviews || []);
+  useEffect(() => {
+    setReviews(product.reviews || []);
+  }, [product.id, product.reviews]);
+
+  const [reviewSortBy, setReviewSortBy] = useState<'highest' | 'lowest' | 'newest'>('highest');
+  const [starFilter, setStarFilter] = useState<number | 'all'>('all');
+
+  // Review Form State (usable inline or in modal)
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [showInlineReviewForm, setShowInlineReviewForm] = useState(false);
   const [newReviewRating, setNewReviewRating] = useState(5);
+  const [newReviewHoverRating, setNewReviewHoverRating] = useState(0);
   const [newReviewName, setNewReviewName] = useState('');
   const [newReviewTitle, setNewReviewTitle] = useState('');
   const [newReviewComment, setNewReviewComment] = useState('');
+  const [newReviewSize, setNewReviewSize] = useState('M');
+  const [newReviewColor, setNewReviewColor] = useState(currentColor.name);
+  const [newReviewFit, setNewReviewFit] = useState<'True to size' | 'Runs slightly small' | 'Runs slightly large'>('True to size');
   const [newReviewSubmitted, setNewReviewSubmitted] = useState(false);
+
+  // Review submission handler
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newReviewName.trim() || !newReviewTitle.trim() || !newReviewComment.trim()) return;
+
+    const newReviewItem: Review = {
+      id: `rev-${Date.now()}`,
+      author: newReviewName.trim(),
+      rating: newReviewRating,
+      date: 'Just now',
+      verified: true,
+      title: newReviewTitle.trim(),
+      comment: newReviewComment.trim(),
+      fitFeedback: newReviewFit,
+      purchasedSize: newReviewSize || selectedSize || 'M',
+      purchasedColor: newReviewColor || currentColor.name,
+    };
+
+    setReviews((prev) => [newReviewItem, ...prev]);
+    setNewReviewSubmitted(true);
+    setTimeout(() => {
+      setNewReviewSubmitted(false);
+      setShowInlineReviewForm(false);
+      setReviewModalOpen(false);
+      setNewReviewName('');
+      setNewReviewTitle('');
+      setNewReviewComment('');
+      setNewReviewRating(5);
+    }, 1600);
+  };
+
+  // Dynamic calculations
+  const totalReviewsCount = reviews.length;
+  const averageRating = totalReviewsCount > 0
+    ? Number((reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviewsCount).toFixed(1))
+    : product.rating;
+
+  const starCounts: Record<number, number> = {
+    5: reviews.filter((r) => r.rating === 5).length,
+    4: reviews.filter((r) => r.rating === 4).length,
+    3: reviews.filter((r) => r.rating === 3).length,
+    2: reviews.filter((r) => r.rating === 2).length,
+    1: reviews.filter((r) => r.rating === 1).length,
+  };
+
+  const getStarPercentage = (count: number) => {
+    if (totalReviewsCount === 0) return 0;
+    return Math.round((count / totalReviewsCount) * 100);
+  };
+
+  // Filter and sort reviews (supports sorting by highest rating)
+  const displayedReviews = [...reviews]
+    .filter((r) => (starFilter === 'all' ? true : r.rating === starFilter))
+    .sort((a, b) => {
+      if (reviewSortBy === 'highest') {
+        return b.rating - a.rating;
+      }
+      if (reviewSortBy === 'lowest') {
+        return a.rating - b.rating;
+      }
+      // newest
+      return b.id.localeCompare(a.id);
+    });
 
   // Sticky Mobile Purchase Bar
   const buyButtonRef = useRef<HTMLDivElement>(null);
@@ -175,6 +266,13 @@ export function PdpView({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
           {/* LEFT: Product Media Area */}
           <div className="lg:col-span-7 space-y-4">
+            {/* Contextual Lighting Preview Controller */}
+            <ContextualLightingControl
+              currentMode={lightingMode}
+              onChangeMode={setLightingMode}
+              className="mb-2"
+            />
+
             {/* Desktop 2-column or large gallery */}
             <div className="hidden sm:grid grid-cols-2 gap-3">
               {currentColor.images.map((img, idx) => (
@@ -184,7 +282,7 @@ export function PdpView({
                     setActiveImageIndex(idx);
                     setZoomModalOpen(true);
                   }}
-                  className={`group relative aspect-[3/4] bg-[#F0EBE2] overflow-hidden rounded-xs cursor-zoom-in ${
+                  className={`group relative aspect-[3/4] bg-[#F0EBE2] overflow-hidden rounded-2xl cursor-zoom-in ${
                     idx === 0 ? 'col-span-2 aspect-[4/5]' : ''
                   }`}
                 >
@@ -192,9 +290,19 @@ export function PdpView({
                     src={img}
                     alt={`${product.title} view ${idx + 1}`}
                     loading={idx === 0 ? 'eager' : 'lazy'}
+                    style={{
+                      filter: lightingConfig.filter,
+                      transition: 'filter 0.4s ease',
+                    }}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-103"
                   />
-                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-white/80 rounded-full backdrop-blur-xs">
+                  {/* Ambient Light Overlay */}
+                  <div
+                    className="absolute inset-0 pointer-events-none transition-all duration-500"
+                    style={lightingConfig.overlayStyle}
+                  />
+
+                  <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity p-2 bg-white/80 rounded-full backdrop-blur-xs z-10">
                     <Maximize2 className="w-4 h-4 text-[#1A1816]" />
                   </div>
                 </div>
@@ -202,12 +310,21 @@ export function PdpView({
             </div>
 
             {/* Mobile Swipeable Gallery */}
-            <div className="sm:hidden relative aspect-[3/4] bg-[#F0EBE2] overflow-hidden rounded-xs">
+            <div className="sm:hidden relative aspect-[3/4] bg-[#F0EBE2] overflow-hidden rounded-2xl">
               <img
                 src={currentColor.images[activeImageIndex] || currentColor.images[0]}
                 alt={product.title}
+                style={{
+                  filter: lightingConfig.filter,
+                  transition: 'filter 0.4s ease',
+                }}
                 className="w-full h-full object-cover"
                 onClick={() => setZoomModalOpen(true)}
+              />
+              {/* Mobile Ambient Light Overlay */}
+              <div
+                className="absolute inset-0 pointer-events-none transition-all duration-500"
+                style={lightingConfig.overlayStyle}
               />
 
               {/* Image Indicators */}
@@ -258,16 +375,33 @@ export function PdpView({
                 {product.subtitle}
               </p>
 
-              {/* Ratings Summary */}
-              <div className="flex items-center gap-2 mt-3 text-xs">
+              {/* Ratings Summary (Click to scroll to reviews) */}
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById('pdp-reviews');
+                  el?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="flex items-center gap-2 mt-3 text-xs cursor-pointer group text-left"
+                aria-label="Scroll to customer reviews"
+              >
                 <div className="flex items-center text-[#D4AF37]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-[#D4AF37] text-[#D4AF37]" />
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-3.5 h-3.5 ${
+                        star <= Math.round(averageRating)
+                          ? 'fill-[#D4AF37] text-[#D4AF37]'
+                          : 'text-[#DDD4C6]'
+                      }`}
+                    />
                   ))}
                 </div>
-                <span className="font-semibold text-[#1A1816]">{product.rating}</span>
-                <span className="text-[#8C7F72]">({product.reviewCount} verified reviews)</span>
-              </div>
+                <span className="font-semibold text-[#1A1816]">{averageRating}</span>
+                <span className="text-[#8C7F72] group-hover:underline">
+                  ({totalReviewsCount} verified {totalReviewsCount === 1 ? 'review' : 'reviews'})
+                </span>
+              </button>
 
               {/* Pricing */}
               <div className="mt-4 flex items-baseline gap-3">
@@ -279,7 +413,7 @@ export function PdpView({
                     <span className="text-sm text-[#94887C] line-through">
                       {formatPrice(product.mrp)}
                     </span>
-                    <span className="text-xs font-bold text-[#A85B3F] bg-[#F7EBE7] px-2 py-0.5 rounded-xs">
+                    <span className="text-xs font-bold text-[#A85B3F] bg-[#F7EBE7] px-2 py-0.5 rounded-full">
                       {product.discountPercent}% OFF
                     </span>
                   </>
@@ -359,7 +493,7 @@ export function PdpView({
                           setSizeError(false);
                         }
                       }}
-                      className={`py-3 text-xs font-semibold rounded-xs border transition-all relative ${
+                      className={`py-3 text-xs font-semibold rounded-full border transition-all relative ${
                         !isAvailable
                           ? 'border-[#EBE4D8] bg-[#F5EFE6]/60 text-[#B8ACA0] hover:bg-[#F2ECE1] cursor-pointer'
                           : isSelected
@@ -391,7 +525,7 @@ export function PdpView({
               )}
 
               {/* Model Specification */}
-              <div className="mt-3 text-[11px] text-[#7A6F64] bg-[#F2EDE4]/60 p-2.5 rounded-xs border border-[#E5DDD1]">
+              <div className="mt-3 text-[11px] text-[#7A6F64] bg-[#F2EDE4]/60 p-2.5 rounded-2xl border border-[#E5DDD1]">
                 <strong>Model Note:</strong> Model is {product.modelInfo.height} wearing size {product.modelInfo.wearingSize}.
               </div>
             </div>
@@ -402,10 +536,10 @@ export function PdpView({
                 <button
                   id="btn-add-to-bag"
                   onClick={handleAddToCart}
-                  className={`flex-1 py-4 px-6 text-xs uppercase tracking-[0.2em] font-bold rounded-xs transition-all flex items-center justify-center gap-2 ${
+                  className={`flex-1 py-4 px-6 text-xs uppercase tracking-[0.2em] font-bold rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md ${
                     isAdded
                       ? 'bg-[#3F6A48] text-white'
-                      : 'bg-[#1F1C18] text-[#FAF8F5] hover:bg-black active:scale-[0.99] shadow-md'
+                      : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] active:scale-[0.99]'
                   }`}
                 >
                   {isAdded ? (
@@ -421,12 +555,12 @@ export function PdpView({
                 <button
                   id="btn-pdp-wishlist"
                   onClick={() => onToggleWishlist(product.id)}
-                  className="w-13 border border-[#DDD4C6] bg-white hover:border-[#1A1816] rounded-xs flex items-center justify-center transition-colors"
+                  className="w-13 border border-[var(--color-border)] bg-white hover:border-[var(--color-primary)] rounded-full flex items-center justify-center transition-colors cursor-pointer"
                   aria-label="Wishlist"
                 >
                   <Heart
                     className={`w-5 h-5 stroke-[1.5] ${
-                      isWishlisted ? 'fill-[#A85B3F] text-[#A85B3F]' : 'text-[#1A1816]'
+                      isWishlisted ? 'fill-[var(--color-primary)] text-[var(--color-primary)]' : 'text-[#1A1816]'
                     }`}
                   />
                 </button>
@@ -435,16 +569,37 @@ export function PdpView({
               <button
                 id="btn-buy-now"
                 onClick={handleBuyNow}
-                className="w-full py-3 text-xs uppercase tracking-[0.18em] font-semibold border border-[#1A1816] text-[#1A1816] hover:bg-[#1A1816] hover:text-[#FAF8F5] transition-colors rounded-xs"
+                className="w-full py-3 text-xs uppercase tracking-[0.18em] font-semibold border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-colors rounded-full cursor-pointer"
               >
                 Instant Buy
               </button>
+
+              {/* Shop Complete Look Quick Trigger */}
+              <button
+                type="button"
+                onClick={() => {
+                  document.getElementById('complete-the-look')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="w-full py-2.5 px-3 bg-[var(--color-surface)]/50 hover:bg-[var(--color-surface)] border border-[var(--color-border)] text-xs font-semibold text-[#1A1816] rounded-full flex items-center justify-between transition-colors cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+                  <span>Shop Coordinated 3-Piece Ensemble (15% Off)</span>
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+              </button>
             </div>
 
+            {/* Next-Gen: Digital Product Passport (DPP) Badge */}
+            <DigitalProductPassportBadge
+              product={product}
+              onOpenPassport={() => setPassportModalOpen(true)}
+            />
+
             {/* Delivery Pincode Verification Module */}
-            <div className="border border-[#EAE3D7] bg-[#FAF7F2] p-4 rounded-xs text-xs space-y-2.5">
+            <div className="border border-[var(--color-border)] bg-[var(--color-surface)]/40 p-4 rounded-2xl text-xs space-y-2.5">
               <div className="flex items-center gap-2 text-[#2D2722] font-semibold uppercase tracking-wider text-[11px]">
-                <Truck className="w-4 h-4 text-[#A85B3F]" />
+                <Truck className="w-4 h-4 text-[var(--color-primary)]" />
                 <span>Delivery &amp; COD Availability</span>
               </div>
 
@@ -455,18 +610,18 @@ export function PdpView({
                   placeholder="Enter 6-digit Indian Pincode (e.g. 110001)"
                   value={pincode}
                   onChange={(e) => setPincode(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-white border border-[#DDD4C6] rounded-xs text-xs focus:outline-none focus:border-[#1A1816]"
+                  className="flex-1 px-3 py-2 bg-white border border-[#DDD4C6] rounded-xl text-xs focus:outline-none focus:border-[#1A1816]"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-[#1A1816] text-white uppercase text-[11px] font-semibold tracking-wider rounded-xs hover:bg-black"
+                  className="px-4 py-2 bg-[#1A1816] text-white uppercase text-[11px] font-semibold tracking-wider rounded-full hover:bg-black"
                 >
                   {pincodeStatus === 'checking' ? 'Verifying...' : 'Check'}
                 </button>
               </form>
 
               {pincodeStatus === 'deliverable' && (
-                <div className="p-3 bg-[#EAF2EC] border border-[#CDE1D0] rounded-xs text-[#204928] space-y-1">
+                <div className="p-3 bg-[#EAF2EC] border border-[#CDE1D0] rounded-2xl text-[#204928] space-y-1">
                   <div className="flex items-center gap-1.5 font-bold text-xs">
                     <Check className="w-4 h-4 text-[#3F6A48]" />
                     <span>Deliverable to {pincode}</span>
@@ -586,82 +741,23 @@ export function PdpView({
         </div>
       </div>
 
-      {/* COMPLETE THE LOOK CROSS-SELL SECTION */}
-      {completeLookItems.length > 0 && (
-        <section id="complete-the-look" className="bg-[#FAF7F2] py-14 border-y border-[#EAE3D7]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#A85B3F] font-semibold block">
-                Atelier Styling
-              </span>
-              <h2 className="font-editorial text-2xl sm:text-4xl text-[#1A1816] font-normal mt-1">
-                Complete The Look
-              </h2>
-              <p className="text-xs text-[#7A6F64] mt-0.5">
-                Items thoughtfully curated to be worn together.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-              {/* Styled Look Image */}
-              <div className="md:col-span-5 aspect-[4/5] bg-[#EDE7DD] rounded-xs overflow-hidden">
-                <img
-                  src={currentColor.images[0]}
-                  alt="Complete look styling"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Accompanying Products List */}
-              <div className="md:col-span-7 space-y-4">
-                {completeLookItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-4 bg-white border border-[#DFD6C8] rounded-xs flex items-center justify-between gap-4"
-                  >
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={item.colors[0].images[0]}
-                        alt={item.title}
-                        onClick={() => onSelectProduct(item.id)}
-                        className="w-16 h-20 object-cover rounded-xs cursor-pointer hover:opacity-90"
-                      />
-                      <div>
-                        <span className="text-[10px] text-[#A85B3F] uppercase tracking-wider font-semibold">
-                          Recommended Companion
-                        </span>
-                        <h4
-                          onClick={() => onSelectProduct(item.id)}
-                          className="text-xs sm:text-sm font-medium text-[#1A1816] hover:text-[#A85B3F] cursor-pointer"
-                        >
-                          {item.title}
-                        </h4>
-                        <p className="text-[11px] text-[#7A6E63]">{item.fabric}</p>
-                        <span className="text-xs font-semibold text-[#1A1816] mt-1 block">
-                          {formatPrice(item.price)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => onAddToCart(item.id, item.colors[0].name, item.sizes[0].size)}
-                      className="px-3.5 py-2 bg-[#1A1816] text-white text-xs uppercase tracking-wider font-semibold rounded-xs hover:bg-black flex items-center gap-1.5 shrink-0"
-                    >
-                      <Plus className="w-3.5 h-3.5" />
-                      <span>Add Item</span>
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* NEXT-GEN: SHOP THE COMPLETE LOOK (INTERACTIVE MODEL HOTSPOTS + 1-CLICK ENSEMBLE) */}
+      <section id="complete-the-look" className="py-12 border-t border-[#EAE3D7]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <ShopTheCompleteLook
+            currentProduct={product}
+            allProducts={allProducts}
+            onAddToCart={onAddToCart}
+            onSelectProduct={onSelectProduct}
+            onOpenBag={onOpenBag}
+          />
+        </div>
+      </section>
 
       {/* FREQUENTLY BOUGHT TOGETHER BUNDLE */}
       {bundleCandidates.length > 0 && (
         <section id="frequently-bought-together" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="border border-[#DFD6C8] bg-white p-6 sm:p-8 rounded-xs">
+          <div className="border border-[#DFD6C8] bg-white p-6 sm:p-8 rounded-full">
             <span className="text-[10px] uppercase tracking-[0.24em] font-semibold text-[#A85B3F] block">
               Curated Ensemble
             </span>
@@ -687,7 +783,7 @@ export function PdpView({
                   <img
                     src={currentColor.images[0]}
                     alt={product.title}
-                    className="w-16 h-20 sm:w-20 sm:h-26 object-cover rounded-xs bg-[#EFE9DF]"
+                    className="w-16 h-20 sm:w-20 sm:h-26 object-cover rounded-2xl bg-[#EFE9DF]"
                   />
                   <div className="text-xs">
                     <p className="font-semibold text-[#1A1816] line-clamp-1">{product.title}</p>
@@ -715,7 +811,7 @@ export function PdpView({
                     <img
                       src={bundleCandidates[0].colors[0].images[0]}
                       alt={bundleCandidates[0].title}
-                      className="w-16 h-20 sm:w-20 sm:h-26 object-cover rounded-xs bg-[#EFE9DF]"
+                      className="w-16 h-20 sm:w-20 sm:h-26 object-cover rounded-2xl bg-[#EFE9DF]"
                     />
                     <div className="text-xs">
                       <p className="font-semibold text-[#1A1816] line-clamp-1">{bundleCandidates[0].title}</p>
@@ -726,7 +822,7 @@ export function PdpView({
               </div>
 
               {/* Bundle Checkout Box */}
-              <div className="lg:col-span-4 bg-[#FAF7F2] p-5 border border-[#E3DBD0] rounded-xs text-xs space-y-3">
+              <div className="lg:col-span-4 bg-[#FAF7F2] p-5 border border-[#E3DBD0] rounded-2xl text-xs space-y-3">
                 <div>
                   <span className="text-[#7A6E63]">Total for {selectedBundleIds.length} items:</span>
                   <div className="text-xl font-bold text-[#1A1816] mt-0.5">
@@ -753,7 +849,7 @@ export function PdpView({
                     }
                     onOpenBag();
                   }}
-                  className="w-full py-3 bg-[#1F1C18] hover:bg-black text-[#FAF8F5] uppercase tracking-[0.16em] font-semibold rounded-xs transition-colors"
+                  className="w-full py-3 bg-[#1F1C18] hover:bg-black text-[#FAF8F5] uppercase tracking-[0.16em] font-semibold rounded-full transition-colors"
                 >
                   Add Selected to Bag
                 </button>
@@ -765,9 +861,9 @@ export function PdpView({
 
       {/* RATINGS & REVIEWS SOCIAL PROOF */}
       <section id="pdp-reviews" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 border-t border-[#EAE3D7]">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {/* Left: Summary & Bar Distribution */}
-          <div className="md:col-span-4 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left: Star Rating System & Distribution Bars */}
+          <div className="md:col-span-4 space-y-5">
             <div>
               <span className="text-[10px] uppercase tracking-[0.24em] font-semibold text-[#A85B3F]">
                 Verified Customer Feedback
@@ -777,102 +873,413 @@ export function PdpView({
               </h3>
             </div>
 
+            {/* Overall Score */}
             <div className="flex items-baseline gap-3">
               <span className="font-editorial text-5xl font-bold text-[#1A1816]">
-                {product.rating}
+                {averageRating}
               </span>
               <div>
                 <div className="flex text-[#D4AF37]">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-[#D4AF37] text-[#D4AF37]" />
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star
+                      key={star}
+                      className={`w-4 h-4 ${
+                        star <= Math.round(averageRating)
+                          ? 'fill-[#D4AF37] text-[#D4AF37]'
+                          : 'text-[#DDD4C6]'
+                      }`}
+                    />
                   ))}
                 </div>
-                <span className="text-xs text-[#7A6F64]">
-                  Based on {product.reviewCount} verified customers
+                <span className="text-xs text-[#7A6F64] block mt-0.5">
+                  Based on {totalReviewsCount} customer {totalReviewsCount === 1 ? 'review' : 'reviews'}
                 </span>
               </div>
             </div>
 
-            {/* Distribution Bars */}
-            <div className="space-y-1.5 text-xs text-[#61564B]">
-              {[
-                { stars: 5, pct: 85 },
-                { stars: 4, pct: 12 },
-                { stars: 3, pct: 3 },
-                { stars: 2, pct: 0 },
-                { stars: 1, pct: 0 },
-              ].map((row) => (
-                <div key={row.stars} className="flex items-center gap-2">
-                  <span className="w-6 text-right font-medium">{row.stars}★</span>
-                  <div className="flex-1 bg-[#EAE3D7] h-2 rounded-full overflow-hidden">
-                    <div className="bg-[#1A1816] h-full" style={{ width: `${row.pct}%` }} />
-                  </div>
-                  <span className="w-8 text-[11px] text-[#8C8074]">{row.pct}%</span>
-                </div>
-              ))}
+            {/* Interactive Star Distribution Bars */}
+            <div className="space-y-2 text-xs text-[#61564B]">
+              <span className="text-[10px] uppercase tracking-wider text-[#8A7D70] font-semibold block">
+                Filter by Star Rating:
+              </span>
+              {[5, 4, 3, 2, 1].map((stars) => {
+                const count = starCounts[stars] || 0;
+                const pct = getStarPercentage(count);
+                const isSelected = starFilter === stars;
+
+                return (
+                  <button
+                    key={stars}
+                    type="button"
+                    onClick={() => setStarFilter((prev) => (prev === stars ? 'all' : stars))}
+                    className={`w-full flex items-center gap-2.5 p-1.5 rounded-full transition-colors group cursor-pointer ${
+                      isSelected ? 'bg-[#FAF3E0] ring-1 ring-[#D4AF37]' : 'hover:bg-[#FAF8F5]'
+                    }`}
+                  >
+                    <span className="w-6 text-right font-medium group-hover:text-[#1A1816]">
+                      {stars}★
+                    </span>
+                    <div className="flex-1 bg-[#EAE3D7] h-2.5 rounded-full overflow-hidden">
+                      <div
+                        className="bg-[#1A1816] h-full transition-all duration-300"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <span className="w-12 text-[11px] text-[#8C8074] text-right font-mono">
+                      {count} ({pct}%)
+                    </span>
+                  </button>
+                );
+              })}
             </div>
 
+            {/* Fit Feedback Highlight */}
+            <div className="p-3 bg-[#FAF7F2] border border-[#E8DFD1] rounded-2xl text-xs space-y-1">
+              <span className="font-semibold text-[#1A1816] text-[11px] uppercase tracking-wider block">
+                Patron Fit Consensus
+              </span>
+              <p className="text-[#6B5E52] text-[11px]">
+                96% of verified buyers say this silhouette is <strong>True to size</strong> tailored for Indian body profiles.
+              </p>
+            </div>
+
+            {/* Write a Review Button */}
             <button
-              onClick={() => setReviewModalOpen(true)}
-              className="w-full py-2.5 border border-[#1A1816] text-[#1A1816] hover:bg-[#1A1816] hover:text-white text-xs uppercase tracking-wider font-semibold rounded-xs transition-colors mt-2"
+              id="btn-write-review-toggle"
+              type="button"
+              onClick={() => setShowInlineReviewForm((prev) => !prev)}
+              className="w-full py-3 bg-[#1A1816] hover:bg-black text-[#FAF8F5] text-xs uppercase tracking-wider font-semibold rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
             >
-              Write a Review
+              <Sparkles className="w-3.5 h-3.5 text-[#D4AF37]" />
+              <span>{showInlineReviewForm ? 'Close Review Form' : 'Write a Review'}</span>
             </button>
           </div>
 
-          {/* Right: Reviews List */}
-          <div className="md:col-span-8 space-y-4">
-            <div className="flex items-center justify-between text-xs text-[#7A6F64] pb-2 border-b border-[#EAE3D7]">
-              <span>Customer Experiences</span>
-              <span>Sorted by Most Helpful</span>
-            </div>
+          {/* Right: Review Controls, Form & Reviews List */}
+          <div className="md:col-span-8 space-y-5">
+            {/* Inline Review Submission Form */}
+            {showInlineReviewForm && (
+              <div
+                id="inline-review-submission-card"
+                className="p-5 sm:p-6 bg-[#FAF8F5] border border-[#E5DFD5] rounded-2xl shadow-sm space-y-4"
+              >
+                <div className="flex items-center justify-between pb-3 border-b border-[#EAE3D7]">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#A85B3F] block">
+                      Share Your Experience
+                    </span>
+                    <h4 className="font-editorial text-2xl text-[#1A1816] font-normal mt-0.5">
+                      Review {product.title}
+                    </h4>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowInlineReviewForm(false)}
+                    className="p-1 text-[#8C7F72] hover:text-[#1A1816]"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
 
-            <div className="divide-y divide-[#EAE3D7] space-y-4">
-              {product.reviews.map((rev) => (
-                <div key={rev.id} className="pt-4 first:pt-0 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-xs text-[#1A1816]">{rev.author}</span>
-                      {rev.verified && (
-                        <span className="text-[10px] bg-[#E8F2EA] text-[#2F6139] px-2 py-0.5 rounded-full font-semibold">
-                          Verified Buyer
+                {newReviewSubmitted ? (
+                  <div className="py-8 text-center space-y-2">
+                    <Check className="w-8 h-8 text-[#2E5836] mx-auto" />
+                    <h5 className="font-editorial text-2xl text-[#1A1816]">Thank you for your feedback!</h5>
+                    <p className="text-xs text-[#7A6E63] max-w-sm mx-auto">
+                      Your review has been verified and added to the patron ledger.
+                    </p>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmitReview} className="space-y-4 text-xs">
+                    {/* Interactive Star Rating Selector */}
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1.5">
+                        Your Star Rating *
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onMouseEnter={() => setNewReviewHoverRating(star)}
+                              onMouseLeave={() => setNewReviewHoverRating(0)}
+                              onClick={() => setNewReviewRating(star)}
+                              className="p-1 cursor-pointer transition-transform hover:scale-115"
+                              aria-label={`${star} Stars`}
+                            >
+                              <Star
+                                className={`w-6 h-6 transition-colors ${
+                                  star <= (newReviewHoverRating || newReviewRating)
+                                    ? 'fill-[#D4AF37] text-[#D4AF37]'
+                                    : 'text-[#DCD5C9]'
+                                }`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                        <span className="text-xs font-semibold text-[#8C6D1F] ml-2">
+                          {(newReviewHoverRating || newReviewRating) === 5 && '5★ — Exceptional (Flawless drape & weave)'}
+                          {(newReviewHoverRating || newReviewRating) === 4 && '4★ — Highly Recommended'}
+                          {(newReviewHoverRating || newReviewRating) === 3 && '3★ — Satisfactory'}
+                          {(newReviewHoverRating || newReviewRating) === 2 && '2★ — Below Expectations'}
+                          {(newReviewHoverRating || newReviewRating) === 1 && '1★ — Needs Improvement'}
                         </span>
-                      )}
+                      </div>
                     </div>
-                    <span className="text-[11px] text-[#9A8E82]">{rev.date}</span>
-                  </div>
 
-                  <div className="flex items-center gap-2">
-                    <div className="flex text-[#D4AF37]">
-                      {[...Array(rev.rating)].map((_, i) => (
-                        <Star key={i} className="w-3 h-3 fill-[#D4AF37] text-[#D4AF37]" />
-                      ))}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1">
+                          Your Full Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Radhika Menon"
+                          value={newReviewName}
+                          onChange={(e) => setNewReviewName(e.target.value)}
+                          className="w-full px-3 py-2 bg-white border border-[#DDD5C7] rounded-xl text-xs text-[#1A1816] focus:outline-none focus:border-[#B2593E]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1">
+                          Headline / Title *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="e.g. Sublime drape and rich texture"
+                          value={newReviewTitle}
+                          onChange={(e) => setNewReviewTitle(e.target.value)}
+                          className="w-full px-3 py-2 bg-white border border-[#DDD5C7] rounded-xl text-xs text-[#1A1816] focus:outline-none focus:border-[#B2593E]"
+                        />
+                      </div>
                     </div>
-                    <span className="text-xs font-semibold text-[#1A1816]">{rev.title}</span>
-                  </div>
 
-                  <p className="text-xs text-[#52473D] leading-relaxed font-light">
-                    {rev.comment}
-                  </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1">
+                          Purchased Size
+                        </label>
+                        <select
+                          value={newReviewSize}
+                          onChange={(e) => setNewReviewSize(e.target.value)}
+                          className="w-full px-2.5 py-2 bg-white border border-[#DDD5C7] rounded-xl text-xs text-[#1A1816] focus:outline-none"
+                        >
+                          {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'].map((sz) => (
+                            <option key={sz} value={sz}>{sz}</option>
+                          ))}
+                        </select>
+                      </div>
 
-                  <div className="flex items-center gap-3 text-[11px] text-[#8C7F72]">
-                    <span>Purchased: Size {rev.purchasedSize} ({rev.purchasedColor})</span>
-                    <span>•</span>
-                    <span className="text-[#3F6A48] font-medium">Fit: {rev.fitFeedback}</span>
-                  </div>
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1">
+                          Colorway
+                        </label>
+                        <select
+                          value={newReviewColor}
+                          onChange={(e) => setNewReviewColor(e.target.value)}
+                          className="w-full px-2.5 py-2 bg-white border border-[#DDD5C7] rounded-xl text-xs text-[#1A1816] focus:outline-none"
+                        >
+                          {product.colors.map((c) => (
+                            <option key={c.name} value={c.name}>{c.name}</option>
+                          ))}
+                        </select>
+                      </div>
 
-                  {rev.userImage && (
-                    <div className="pt-1">
-                      <img
-                        src={rev.userImage}
-                        alt="Customer photo"
-                        className="w-16 h-20 object-cover rounded-xs border border-[#DFD6C8]"
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1">
+                          Fit Experience
+                        </label>
+                        <select
+                          value={newReviewFit}
+                          onChange={(e) => setNewReviewFit(e.target.value as any)}
+                          className="w-full px-2.5 py-2 bg-white border border-[#DDD5C7] rounded-xl text-xs text-[#1A1816] focus:outline-none"
+                        >
+                          <option value="True to size">True to size</option>
+                          <option value="Runs slightly small">Runs slightly small</option>
+                          <option value="Runs slightly large">Runs slightly large</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#38312A] mb-1">
+                        Detailed Review Feedback *
+                      </label>
+                      <textarea
+                        rows={3}
+                        required
+                        placeholder="Tell other patrons about the fabric feel, drape, craftsmanship, and how you styled it..."
+                        value={newReviewComment}
+                        onChange={(e) => setNewReviewComment(e.target.value)}
+                        className="w-full px-3 py-2 bg-white border border-[#DDD5C7] rounded-xl text-xs text-[#1A1816] focus:outline-none focus:border-[#B2593E]"
                       />
                     </div>
-                  )}
-                </div>
-              ))}
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[10px] text-[#8C7A6B]">
+                        Reviews are published immediately after automatic spam filtering.
+                      </span>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowInlineReviewForm(false)}
+                          className="px-4 py-2 border border-[#DDD5C7] text-[#5C5146] hover:bg-[#F2ECE1] uppercase tracking-wider text-xs font-semibold rounded-full transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="px-6 py-2 bg-[#1A1816] hover:bg-black text-[#FAF8F5] uppercase tracking-wider text-xs font-semibold rounded-full transition-colors cursor-pointer shadow-xs"
+                        >
+                          Submit Review
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                )}
+              </div>
+            )}
+
+            {/* Filter & Sort Controls Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#EAE3D7]">
+              {/* Star Filter Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[10px] uppercase tracking-wider text-[#8A7D71] font-semibold mr-1">
+                  Filter:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setStarFilter('all')}
+                  className={`text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider font-medium transition-colors ${
+                    starFilter === 'all'
+                      ? 'bg-[#1A1816] text-white font-semibold'
+                      : 'bg-white border border-[#D8CEBF] text-[#6B5E52] hover:border-[#1A1816]'
+                  }`}
+                >
+                  All ({totalReviewsCount})
+                </button>
+                {[5, 4, 3].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setStarFilter(star)}
+                    className={`text-[11px] px-2.5 py-1 rounded-full uppercase tracking-wider font-medium transition-colors ${
+                      starFilter === star
+                        ? 'bg-[#1A1816] text-white font-semibold'
+                        : 'bg-white border border-[#D8CEBF] text-[#6B5E52] hover:border-[#1A1816]'
+                    }`}
+                  >
+                    {star}★ ({starCounts[star] || 0})
+                  </button>
+                ))}
+              </div>
+
+              {/* Sort Selector: specifically provides "Sort by Highest Rating" */}
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <span className="text-[10px] uppercase tracking-wider text-[#8A7D71] font-semibold shrink-0">
+                  Sort:
+                </span>
+                <select
+                  id="reviews-sort-by-select"
+                  value={reviewSortBy}
+                  onChange={(e) => setReviewSortBy(e.target.value as any)}
+                  className="px-2.5 py-1.5 bg-white border border-[#D8CEBF] rounded-full text-xs text-[#1A1816] font-medium focus:outline-none focus:border-[#B2593E] cursor-pointer"
+                  aria-label="Sort reviews"
+                >
+                  <option value="highest">Highest Rating (5★ → 1★)</option>
+                  <option value="lowest">Lowest Rating (1★ → 5★)</option>
+                  <option value="newest">Newest First</option>
+                </select>
+              </div>
             </div>
+
+            {/* Active Filter Notice */}
+            {starFilter !== 'all' && (
+              <div className="flex items-center justify-between p-2.5 bg-[#FAF3E0] border border-[#E8D4A2] rounded-2xl text-xs text-[#8C6D1F]">
+                <span>
+                  Showing reviews with <strong>{starFilter} Stars</strong> ({displayedReviews.length} found)
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setStarFilter('all')}
+                  className="text-xs font-semibold text-[#B2593E] hover:underline"
+                >
+                  Clear Filter ×
+                </button>
+              </div>
+            )}
+
+            {/* Reviews List */}
+            {displayedReviews.length === 0 ? (
+              <div className="py-12 text-center bg-[#FAF8F5] border border-[#EAE3D7] rounded-2xl space-y-2">
+                <p className="font-editorial text-lg text-[#1A1816]">No reviews found matching this filter</p>
+                <button
+                  type="button"
+                  onClick={() => setStarFilter('all')}
+                  className="text-xs text-[#B2593E] font-semibold underline"
+                >
+                  Show all {totalReviewsCount} reviews
+                </button>
+              </div>
+            ) : (
+              <div className="divide-y divide-[#EAE3D7] space-y-4">
+                {displayedReviews.map((rev) => (
+                  <div key={rev.id} className="pt-4 first:pt-0 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-xs text-[#1A1816]">{rev.author}</span>
+                        {rev.verified && (
+                          <span className="text-[10px] bg-[#E8F2EA] text-[#2F6139] px-2 py-0.5 rounded-full font-semibold">
+                            Verified Buyer
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-[#9A8E82] font-mono">{rev.date}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <div className="flex text-[#D4AF37]">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-3.5 h-3.5 ${
+                              star <= rev.rating
+                                ? 'fill-[#D4AF37] text-[#D4AF37]'
+                                : 'text-[#DDD4C6]'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs font-semibold text-[#1A1816]">{rev.title}</span>
+                    </div>
+
+                    <p className="text-xs text-[#52473D] leading-relaxed font-light">
+                      {rev.comment}
+                    </p>
+
+                    <div className="flex items-center gap-3 text-[11px] text-[#8C7F72]">
+                      <span>Purchased: Size {rev.purchasedSize} ({rev.purchasedColor})</span>
+                      <span>•</span>
+                      <span className="text-[#3F6A48] font-medium">Fit: {rev.fitFeedback}</span>
+                    </div>
+
+                    {rev.userImage && (
+                      <div className="pt-1">
+                        <img
+                          src={rev.userImage}
+                          alt="Customer photo"
+                          className="w-16 h-20 object-cover rounded-2xl border border-[#DFD6C8]"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -941,7 +1348,7 @@ export function PdpView({
               <img
                 src={currentColor.images[0]}
                 alt={product.title}
-                className="w-10 h-12 object-cover rounded-xs bg-[#EFE9DF] shrink-0"
+                className="w-10 h-12 object-cover rounded-2xl bg-[#EFE9DF] shrink-0"
               />
               <div className="overflow-hidden">
                 <span className="text-xs font-semibold text-[#1A1816] truncate block leading-tight">
@@ -955,7 +1362,7 @@ export function PdpView({
 
             <button
               onClick={handleAddToCart}
-              className="px-5 py-2.5 bg-[#1F1C18] text-white text-xs uppercase tracking-wider font-semibold rounded-xs shrink-0"
+              className="px-5 py-2.5 bg-[#1F1C18] text-white text-xs uppercase tracking-wider font-semibold rounded-full shrink-0"
             >
               {selectedSize ? `Add ${selectedSize}` : 'Select Size'}
             </button>
@@ -970,7 +1377,7 @@ export function PdpView({
           onClick={() => setNotifyModalOpen(null)}
         >
           <div
-            className="w-full max-w-sm bg-[#FAF8F5] p-6 rounded-lg shadow-2xl"
+            className="w-full max-w-sm bg-[#FAF8F5] p-6 rounded-2xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-[#EAE3D7]">
@@ -985,7 +1392,7 @@ export function PdpView({
               Size <strong>{notifyModalOpen}</strong> is currently being woven by our master artisans. Leave your email for immediate priority access.
             </p>
             {notifySubmitted ? (
-              <div className="mt-4 p-3 bg-[#E8F2EA] text-[#285832] text-xs font-medium rounded-xs flex items-center gap-2">
+              <div className="mt-4 p-3 bg-[#E8F2EA] text-[#285832] text-xs font-medium rounded-2xl flex items-center gap-2">
                 <Check className="w-4 h-4 text-[#3F6A48]" />
                 <span>You are on the restock notification list!</span>
               </div>
@@ -1003,11 +1410,11 @@ export function PdpView({
                   placeholder="Enter your email address..."
                   value={notifyEmail}
                   onChange={(e) => setNotifyEmail(e.target.value)}
-                  className="w-full p-2.5 bg-white border border-[#DDD3C5] rounded-xs text-xs focus:outline-none focus:border-[#1A1816]"
+                  className="w-full p-2.5 bg-white border border-[#DDD3C5] rounded-xl text-xs focus:outline-none focus:border-[#1A1816]"
                 />
                 <button
                   type="submit"
-                  className="w-full py-2.5 bg-[#1A1816] text-white text-xs uppercase tracking-wider font-semibold rounded-xs"
+                  className="w-full py-2.5 bg-[#1A1816] text-white text-xs uppercase tracking-wider font-semibold rounded-full"
                 >
                   Notify Me
                 </button>
@@ -1041,17 +1448,22 @@ export function PdpView({
       {/* WRITE A REVIEW MODAL */}
       {reviewModalOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto"
           onClick={() => setReviewModalOpen(false)}
         >
           <div
-            className="w-full max-w-md bg-[#FAF8F5] p-6 rounded-lg shadow-2xl"
+            className="w-full max-w-lg bg-[#FAF8F5] p-6 rounded-2xl shadow-2xl border border-[#EAE3D7] my-8"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-[#EAE3D7]">
-              <h4 className="font-editorial text-2xl font-normal text-[#1A1816]">
-                Review {product.title}
-              </h4>
+              <div>
+                <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#A85B3F] block">
+                  Patron Review
+                </span>
+                <h4 className="font-editorial text-2xl font-normal text-[#1A1816]">
+                  Review {product.title}
+                </h4>
+              </div>
               <button onClick={() => setReviewModalOpen(false)}>
                 <X className="w-5 h-5 text-[#6E6358]" />
               </button>
@@ -1059,84 +1471,139 @@ export function PdpView({
 
             {newReviewSubmitted ? (
               <div className="py-8 text-center space-y-2">
-                <Check className="w-8 h-8 text-[#3F6A48] mx-auto" />
-                <p className="font-editorial text-xl text-[#1A1816]">Thank you for your feedback</p>
+                <Check className="w-8 h-8 text-[#2E5836] mx-auto" />
+                <p className="font-editorial text-2xl text-[#1A1816]">Thank you for your feedback</p>
                 <p className="text-xs text-[#7A6E63]">
-                  Your review helps fellow patrons make informed silhouette selections.
+                  Your review has been verified and added to the patron ledger.
                 </p>
               </div>
             ) : (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setNewReviewSubmitted(true);
-                  setTimeout(() => {
-                    setReviewModalOpen(false);
-                    setNewReviewSubmitted(false);
-                  }, 1800);
-                }}
-                className="mt-4 space-y-3 text-xs"
-              >
+              <form onSubmit={handleSubmitReview} className="mt-4 space-y-3.5 text-xs">
                 <div>
-                  <label className="block font-medium text-[#2F2823] mb-1">Your Rating</label>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setNewReviewRating(star)}
-                      >
-                        <Star
-                          className={`w-5 h-5 ${
-                            star <= newReviewRating
-                              ? 'fill-[#D4AF37] text-[#D4AF37]'
-                              : 'text-[#DDD4C6]'
-                          }`}
-                        />
-                      </button>
-                    ))}
+                  <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1.5">
+                    Your Rating *
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onMouseEnter={() => setNewReviewHoverRating(star)}
+                          onMouseLeave={() => setNewReviewHoverRating(0)}
+                          onClick={() => setNewReviewRating(star)}
+                          className="p-1 cursor-pointer"
+                        >
+                          <Star
+                            className={`w-6 h-6 ${
+                              star <= (newReviewHoverRating || newReviewRating)
+                                ? 'fill-[#D4AF37] text-[#D4AF37]'
+                                : 'text-[#DDD4C6]'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                    <span className="text-xs font-semibold text-[#8C6D1F]">
+                      {(newReviewHoverRating || newReviewRating)} / 5 Stars
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1">
+                      Your Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Radhika Menon"
+                      value={newReviewName}
+                      onChange={(e) => setNewReviewName(e.target.value)}
+                      className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xl text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1">
+                      Headline *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Sublime drape and rich texture"
+                      value={newReviewTitle}
+                      onChange={(e) => setNewReviewTitle(e.target.value)}
+                      className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xl text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1">
+                      Purchased Size
+                    </label>
+                    <select
+                      value={newReviewSize}
+                      onChange={(e) => setNewReviewSize(e.target.value)}
+                      className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xl text-xs"
+                    >
+                      {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'].map((sz) => (
+                        <option key={sz} value={sz}>{sz}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1">
+                      Colorway
+                    </label>
+                    <select
+                      value={newReviewColor}
+                      onChange={(e) => setNewReviewColor(e.target.value)}
+                      className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xl text-xs"
+                    >
+                      {product.colors.map((c) => (
+                        <option key={c.name} value={c.name}>{c.name}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1">
+                      Fit Experience
+                    </label>
+                    <select
+                      value={newReviewFit}
+                      onChange={(e) => setNewReviewFit(e.target.value as any)}
+                      className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xl text-xs"
+                    >
+                      <option value="True to size">True to size</option>
+                      <option value="Runs slightly small">Runs slightly small</option>
+                      <option value="Runs slightly large">Runs slightly large</option>
+                    </select>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-medium text-[#2F2823] mb-1">Your Name</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Radhika M."
-                    value={newReviewName}
-                    onChange={(e) => setNewReviewName(e.target.value)}
-                    className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-medium text-[#2F2823] mb-1">Headline</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. Sublime drape and rich texture"
-                    value={newReviewTitle}
-                    onChange={(e) => setNewReviewTitle(e.target.value)}
-                    className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xs"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-medium text-[#2F2823] mb-1">Your Review</label>
+                  <label className="block text-[11px] uppercase tracking-wider font-semibold text-[#2F2823] mb-1">
+                    Your Review *
+                  </label>
                   <textarea
                     rows={3}
                     required
                     placeholder="Describe the fabric feel, drape, and sizing..."
                     value={newReviewComment}
                     onChange={(e) => setNewReviewComment(e.target.value)}
-                    className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xs"
+                    className="w-full p-2 bg-white border border-[#DDD3C5] rounded-xl text-xs"
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#1A1816] text-white uppercase tracking-wider font-semibold rounded-xs"
+                  className="w-full py-3 bg-[#1A1816] hover:bg-black text-white uppercase tracking-wider font-semibold rounded-full transition-colors cursor-pointer shadow-xs"
                 >
                   Submit Review
                 </button>
@@ -1145,6 +1612,13 @@ export function PdpView({
           </div>
         </div>
       )}
+
+      {/* Next-Gen: Digital Product Passport (DPP) Full Transparency Modal */}
+      <DigitalProductPassportModal
+        isOpen={passportModalOpen}
+        onClose={() => setPassportModalOpen(false)}
+        product={product}
+      />
     </div>
   );
 }

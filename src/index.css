@@ -1,62 +1,115 @@
 @import "tailwindcss";
 
+@theme {
+  --font-editorial: "Playfair Display", Georgia, serif;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
 @layer base {
-  :root {
-    --color-bg: #FFFFFF;
-    --color-surface: #FAFAF8;
-    --color-surface-hover: #F4F1EA;
-    --color-border: #EAE6DF;
-    --color-text-main: #161514;
-    --color-text-muted: #6E6862;
-    --color-gold: #C29B38;
-    --color-terracotta: #B2593E;
+  :root,
+  [data-theme="all"] {
+    --color-bg: #FAF8F5;
+    --color-surface: #F5EFE8;
+    --color-surface-hover: #ECE4D9;
+    --color-border: #E6DDD0;
+    --color-primary: #8F6B4E;
+    --color-primary-hover: #79573D;
+    --color-secondary: #B59379;
+    --color-accent: #5D8B84;
+    --color-text-main: #221D19;
+    --color-text-muted: #6E6359;
+    --color-badge-bg: #F3EAE0;
+    --color-badge-text: #705139;
+    --color-glow: rgba(143, 107, 78, 0.12);
+  }
+
+  /* DEDICATED MENSWEAR STORE: Light-Brown, Sand Fawn & Raw Flax Luxury */
+  [data-theme="men"] {
+    --color-bg: #FAF7F2;
+    --color-surface: #F4ECE1;
+    --color-surface-hover: #EBE0D2;
+    --color-border: #E5DDD0;
+    --color-primary: #8F6B4E;
+    --color-primary-hover: #78563A;
+    --color-secondary: #A88365;
+    --color-accent: #7A573B;
+    --color-text-main: #241F1A;
+    --color-text-muted: #6B6157;
+    --color-badge-bg: #F2E9DE;
+    --color-badge-text: #6E4F37;
+    --color-glow: rgba(143, 107, 78, 0.15);
+  }
+
+  /* DEDICATED LADIESWEAR STORE: Soft Pastel Orchid, Rosewater Blush & Ethereal Teal */
+  [data-theme="women"] {
+    --color-bg: #FAF6FB;
+    --color-surface: #F6EDF7;
+    --color-surface-hover: #EEDEED;
+    --color-border: #E8D6EB;
+    --color-primary: #866791;
+    --color-primary-hover: #72527D;
+    --color-secondary: #D49DA6;
+    --color-accent: #52827A;
+    --color-text-main: #231C26;
+    --color-text-muted: #695C6F;
+    --color-badge-bg: #F6EAF6;
+    --color-badge-text: #6B4779;
+    --color-glow: rgba(134, 103, 145, 0.16);
   }
 
   body {
-    background-color: #FFFFFF;
-    color: #161514;
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-bg);
+    color: var(--color-text-main);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    transition: background-color 0.4s ease, color 0.4s ease;
   }
 
-  h1, h2, h3, .font-serif-luxury {
-    font-family: 'Cormorant Garamond', Georgia, serif;
-    letter-spacing: -0.01em;
+  h1, h2, h3, .font-editorial {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.02em;
+    font-weight: 400;
+  }
+
+  .font-serif-luxury {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: 0.015em;
+  }
+
+  .font-sans {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #FAFAF8;
+  background: var(--color-bg);
 }
 ::-webkit-scrollbar-thumb {
-  background: #D8D2C7;
+  background: #D8D1C5;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #B5ACA0;
 }
 
-/* Smooth motion utility classes */
-.soft-glow {
-  box-shadow: 0 10px 30px -10px rgba(194, 155, 56, 0.15);
-}
-
+/* Luxury shadows */
 .luxury-card-shadow {
-  box-shadow: 0 4px 20px -2px rgba(22, 21, 20, 0.05);
+  box-shadow: 0 4px 20px -3px rgba(35, 30, 26, 0.04);
 }
 
 .luxury-card-shadow-hover {
-  box-shadow: 0 14px 34px -4px rgba(22, 21, 20, 0.09);
+  box-shadow: 0 12px 32px -4px var(--color-glow);
 }
 
-/* Hide scrollbar for clean carousels */
+/* Hide scrollbar for carousels */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
