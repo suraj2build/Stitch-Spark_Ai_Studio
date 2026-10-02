@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Heart, ShoppingBag, Menu, X, ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
+import { Search, Heart, ShoppingBag, Menu, X, ArrowRight, Sparkles, ChevronDown, Truck } from 'lucide-react';
 import { Gender } from '../types';
 
 interface HeaderProps {
@@ -203,6 +203,17 @@ export function Header({
                   <span className="w-1.5 h-1.5 rounded-full bg-[#B2593E] animate-pulse" />
                   <span>Watch &amp; Shop</span>
                 </button>
+
+                <button
+                  id="btn-header-track-order"
+                  onClick={() => onNavigate('order-status')}
+                  className={`py-2 transition-colors flex items-center gap-1.5 ${
+                    currentRoute === 'order-status' ? 'text-[#181716] font-semibold' : 'text-[#59534C] hover:text-[#181716]'
+                  }`}
+                >
+                  <Truck className="w-3.5 h-3.5 text-[#B2593E]" />
+                  <span>Track Order</span>
+                </button>
               </nav>
             </div>
 
@@ -357,6 +368,18 @@ export function Header({
                     className="block w-full text-left py-2 border-b border-[#F4F1EA] hover:text-[#B2593E]"
                   >
                     Saved Garments ({wishlistCount})
+                  </button>
+
+                  <button
+                    id="btn-mobile-track-order"
+                    onClick={() => {
+                      onNavigate('order-status');
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block w-full text-left py-2 border-b border-[#F4F1EA] hover:text-[#B2593E] flex items-center gap-2"
+                  >
+                    <Truck className="w-4 h-4 text-[#B2593E]" />
+                    <span>Track Order Status</span>
                   </button>
                 </div>
               </div>

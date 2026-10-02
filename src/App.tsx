@@ -11,16 +11,18 @@ import { PlpView } from './views/PlpView';
 import { PdpView } from './views/PdpView';
 import { ReelsView } from './views/ReelsView';
 import { WishlistView } from './views/WishlistView';
+import { OrderStatusView } from './views/OrderStatusView';
 import { PRODUCTS, REELS, STYLED_LOOKS } from './data/mockData';
 import { Product, CartItem, Gender } from './types';
 
 export default function App() {
   // Navigation & Routing State
-  const [currentView, setCurrentView] = useState<'home' | 'plp' | 'pdp' | 'reels' | 'wishlist'>('home');
+  const [currentView, setCurrentView] = useState<'home' | 'plp' | 'pdp' | 'reels' | 'wishlist' | 'order-status'>('home');
   const [activeGender, setActiveGender] = useState<Gender>('all');
   const [activeCategory, setActiveCategory] = useState<string | undefined>(undefined);
   const [selectedProductId, setSelectedProductId] = useState<string>(PRODUCTS[0].id);
   const [activeReelId, setActiveReelId] = useState<string | undefined>(undefined);
+  const [trackedOrderId, setTrackedOrderId] = useState<string | undefined>(undefined);
 
   // Commerce State: Bag & Wishlist
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -49,9 +51,9 @@ export default function App() {
   // Navigation Handler
   const handleNavigate = (
     view: string,
-    params?: { gender?: Gender; category?: string; productId?: string; reelId?: string }
+    params?: { gender?: Gender; category?: string; productId?: string; reelId?: string; orderId?: string }
   ) => {
-    if (view === 'home' || view === 'plp' || view === 'pdp' || view === 'reels' || view === 'wishlist') {
+    if (view === 'home' || view === 'plp' || view === 'pdp' || view === 'reels' || view === 'wishlist' || view === 'order-status') {
       setCurrentView(view);
     }
     if (params?.gender) setActiveGender(params.gender);
@@ -61,6 +63,7 @@ export default function App() {
       recordRecentlyViewed(params.productId);
     }
     if (params?.reelId) setActiveReelId(params.reelId);
+    if (params?.orderId) setTrackedOrderId(params.orderId);
     scrollToTop();
   };
 
@@ -236,6 +239,14 @@ export default function App() {
             onNavigateToCatalog={() => handleNavigate('plp', { gender: 'all' })}
           />
         )}
+
+        {currentView === 'order-status' && (
+          <OrderStatusView
+            initialOrderId={trackedOrderId}
+            onSelectProduct={handleSelectProduct}
+            onNavigate={handleNavigate}
+          />
+        )}
       </div>
 
       {/* Global Footer */}
@@ -257,6 +268,7 @@ export default function App() {
           handleToggleWishlist(productId);
         }}
         onSelectProduct={handleSelectProduct}
+        onNavigate={handleNavigate}
         onCheckout={() => {
           alert('Thank you for choosing VANYA. In production, this proceeds to secure payment processing.');
         }}

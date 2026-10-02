@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ArrowRight, Check, ShieldCheck, RefreshCw, Truck, HeartHandshake } from 'lucide-react';
+import React from 'react';
+import { ShieldCheck, RefreshCw, Truck, HeartHandshake } from 'lucide-react';
+import { NewsletterSignup } from './NewsletterSignup';
 
 interface FooterProps {
   onOpenSizeGuide: () => void;
@@ -7,14 +8,6 @@ interface FooterProps {
 }
 
 export function Footer({ onOpenSizeGuide, onNavigate }: FooterProps) {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setSubscribed(true);
-  };
 
   return (
     <footer id="main-footer" className="bg-[#1A1816] text-[#FAF8F5] pt-14 pb-8 border-t border-[#312C28]">
@@ -84,31 +77,7 @@ export function Footer({ onOpenSizeGuide, onNavigate }: FooterProps) {
             </p>
 
             <div className="pt-2">
-              <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#EDE6DC] block mb-2">
-                Join the Private Gazette
-              </span>
-              <form onSubmit={handleSubscribe} className="flex max-w-sm">
-                <input
-                  type="email"
-                  placeholder="Enter your email address..."
-                  value={email}
-                  disabled={subscribed}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 bg-[#26221E] border border-[#3E3832] px-3 py-2 text-xs text-white placeholder:text-[#887D70] focus:outline-none focus:border-[#D4AF37] rounded-l-xs"
-                />
-                <button
-                  type="submit"
-                  disabled={subscribed}
-                  className="px-4 py-2 bg-[#FAF8F5] text-[#1A1816] text-xs font-semibold uppercase tracking-wider rounded-r-xs hover:bg-[#EAE4D8] transition-colors flex items-center justify-center shrink-0"
-                >
-                  {subscribed ? <Check className="w-4 h-4 text-green-700" /> : <ArrowRight className="w-4 h-4" />}
-                </button>
-              </form>
-              {subscribed && (
-                <p className="text-[11px] text-[#D4AF37] mt-1.5">
-                  Welcome to the VANYA community. Expect curated seasonal previews.
-                </p>
-              )}
+              <NewsletterSignup />
             </div>
           </div>
 
@@ -158,9 +127,12 @@ export function Footer({ onOpenSizeGuide, onNavigate }: FooterProps) {
                 </button>
               </li>
               <li>
-                <span className="hover:text-white transition-colors cursor-pointer">
+                <button
+                  onClick={() => onNavigate('order-status')}
+                  className="hover:text-white transition-colors text-left"
+                >
                   Shipping &amp; Order Tracking
-                </span>
+                </button>
               </li>
               <li>
                 <span className="hover:text-white transition-colors cursor-pointer">

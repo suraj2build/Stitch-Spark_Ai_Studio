@@ -112,3 +112,76 @@ export interface FilterState {
   sortBy: 'featured' | 'newest' | 'price-asc' | 'price-desc' | 'rating';
   inStockOnly: boolean;
 }
+
+export type OrderProgressStepKey =
+  | 'confirmed'
+  | 'crafting'
+  | 'dispatched'
+  | 'out_for_delivery'
+  | 'delivered';
+
+export interface OrderTimelineEvent {
+  id: string;
+  stepKey: OrderProgressStepKey;
+  title: string;
+  description: string;
+  timestamp: string;
+  location?: string;
+  isCompleted: boolean;
+}
+
+export interface OrderItemSummary {
+  productId: string;
+  title: string;
+  subtitle?: string;
+  colorName: string;
+  size: string;
+  quantity: number;
+  price: number;
+  image: string;
+}
+
+export interface CustomerOrder {
+  id: string; // e.g. VAN-8921-DEL
+  customerEmail: string;
+  customerName: string;
+  customerPhone: string;
+  orderDate: string;
+  estimatedDeliveryDate: string;
+  currentStep: OrderProgressStepKey;
+  stepNumber: number; // 1 to 5
+  statusLabel: string;
+  statusBadgeVariant: 'warning' | 'info' | 'primary' | 'success';
+  items: OrderItemSummary[];
+  shippingAddress: {
+    fullName: string;
+    phone: string;
+    street: string;
+    city: string;
+    state: string;
+    pincode: string;
+    country: string;
+  };
+  payment: {
+    method: string;
+    subtotal: number;
+    shipping: number;
+    discount: number;
+    total: number;
+    isPaid: boolean;
+  };
+  carrier: {
+    name: string;
+    trackingNumber: string;
+    trackingUrl?: string;
+    serviceType: string;
+    currentLocation?: string;
+    deliveryOtpRequired?: boolean;
+    assignedRider?: {
+      name: string;
+      phone: string;
+    };
+  };
+  timeline: OrderTimelineEvent[];
+}
+

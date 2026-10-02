@@ -13,6 +13,7 @@ interface BagDrawerProps {
   onMoveToWishlist: (cartItemId: string, productId: string) => void;
   onSelectProduct: (productId: string) => void;
   onCheckout: () => void;
+  onNavigate?: (route: string, params?: any) => void;
 }
 
 export function BagDrawer({
@@ -25,6 +26,7 @@ export function BagDrawer({
   onMoveToWishlist,
   onSelectProduct,
   onCheckout,
+  onNavigate,
 }: BagDrawerProps) {
   if (!isOpen) return null;
 
@@ -307,6 +309,21 @@ export function BagDrawer({
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </button>
+
+            {onNavigate && (
+              <div className="pt-2 text-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onNavigate('order-status');
+                  }}
+                  className="text-[11px] text-[#8C7A6B] hover:text-[#1A1816] hover:underline transition-colors"
+                >
+                  Already ordered? Track your package status →
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
