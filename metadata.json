@@ -1,0 +1,8 @@
+{
+  "name": "Remix VANYA - Modern Indian Fashion Flagship",
+  "description": "Editorial fashion ecommerce platform featuring contemporary Indian apparel for Men and Women, shoppable reels, styled looks, and responsive luxury shopping experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

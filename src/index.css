@@ -1,0 +1,66 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-bg: #FFFFFF;
+    --color-surface: #FAFAF8;
+    --color-surface-hover: #F4F1EA;
+    --color-border: #EAE6DF;
+    --color-text-main: #161514;
+    --color-text-muted: #6E6862;
+    --color-gold: #C29B38;
+    --color-terracotta: #B2593E;
+  }
+
+  body {
+    background-color: #FFFFFF;
+    color: #161514;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif-luxury {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #FAFAF8;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D2C7;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B5ACA0;
+}
+
+/* Smooth motion utility classes */
+.soft-glow {
+  box-shadow: 0 10px 30px -10px rgba(194, 155, 56, 0.15);
+}
+
+.luxury-card-shadow {
+  box-shadow: 0 4px 20px -2px rgba(22, 21, 20, 0.05);
+}
+
+.luxury-card-shadow-hover {
+  box-shadow: 0 14px 34px -4px rgba(22, 21, 20, 0.09);
+}
+
+/* Hide scrollbar for clean carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
